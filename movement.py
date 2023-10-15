@@ -1,4 +1,5 @@
 from pybricks.robotics import DriveBase
+from pybricks.ev3devices import Motor, ColorSensor
 
 BLACK = 9
 WHITE = 85
@@ -8,18 +9,14 @@ PROPORTIONAL_GAIN = 1.2
 isLeft = True
 
 
-def drive(robot, speed, turnRate):
-    robot.drive(speed, turnRate)
-
-
 def moveByLine(leftMotor, rightMotor, lineSensor):
-    multiplier = 1
+    multiplier = -1
     if isLeft:
-        multiplier = -1
+        multiplier = 1
     deviation = lineSensor.reflection() - threshold
     turn_rate = PROPORTIONAL_GAIN * deviation
-    robot = DriveBase(leftMotor, rightMotor, wheelDiameter=55.5, axleTrack=104)
-    drive(robot, DRIVE_SPEED, turn_rate * multiplier)
+    robot = DriveBase(leftMotor, rightMotor, wheel_diameter=55.5, axle_track=162)
+    robot.drive(DRIVE_SPEED, turn_rate)
 
 
 def changeLine():
