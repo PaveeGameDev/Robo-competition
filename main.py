@@ -1,75 +1,29 @@
 #!/usr/bin/env pybricks-micropython
-# import movement
-
-# from pybricks.ev3devices import Motor, ColorSensor
-# from pybricks.parameters import Port
-# from pybricks.tools import wait
-# from pybricks.hubs import EV3Brick
-# from pybricks.robotics import DriveBase
-
-# # Initialize the motors and sensors.
-# leftMotor = Motor(Port.B)
-# rightMotor = Motor(Port.A)
-# lineSensor = ColorSensor(Port.S3)
-
-# ev3 = EV3Brick()
-
-# ev3.speaker.beep()
-
-# while True:
-#     deviation = lineSensor.reflection() - 57
-#     turn_rate = 4 * deviation
-#     # robot = DriveBase(leftMotor, rightMotor, wheel_diameter=55.5, axle_track=104)
-#     print(turn_rate)
-#     leftMotor.run(100 + turn_rate)
-#     rightMotor.run(100 - turn_rate)
-#     # moveByLine(leftMotor, rightMotor, lineSensor)
-#     # if ev3.buttons.pressed().length > 0:
-#     #     movement.changeLine()
-#     wait(10)
-
-
-
-
-
 from pybricks.ev3devices import Motor, ColorSensor
 from pybricks.parameters import Port
 from pybricks.tools import wait
 from pybricks.robotics import DriveBase
 
-# Initialize the motors.
+# Initialize everything
 left_motor = Motor(Port.B)
 right_motor = Motor(Port.A)
-
-# Initialize the color sensor.
 line_sensor = ColorSensor(Port.S3)
-
-# Initialize the drive base.
 robot = DriveBase(left_motor, right_motor, wheel_diameter=55.5, axle_track=162)
 
-# Calculate the light threshold. Choose values based on your measurements.
-BLACK = 9
-WHITE = 85
+# constanc
+BLACK = 17
+WHITE = 57
 threshold = (BLACK + WHITE) / 2
-
-# Set the drive speed at 100 millimeters per second.
-DRIVE_SPEED = 100
-
-# Set the gain of the proportional line controller. This means that for every
-# percentage point of light deviating from the threshold, we set the turn
-# rate of the drivebase to 1.2 degrees per second.
-
-# For example, if the light value deviates from the threshold by 10, the robot
-# steers at 10*1.2 = 12 degrees per second.
+DRIVE_SPEED = 50
 PROPORTIONAL_GAIN = 8
 
 # Start following the line endlessly.
 while True:
-    # Calculate the deviation from the threshold.
     deviation = line_sensor.reflection() - threshold
 
     # Calculate the turn rate.
-    turn_rate = PROPORTIONAL_GAIN * deviation
+    turn_rate = deviation * abs(deviation) / 3
+    print(turn_rate)
 
     # Set the drive base speed and turn rate.
     robot.drive(DRIVE_SPEED, turn_rate)
