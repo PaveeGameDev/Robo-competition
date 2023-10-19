@@ -14,7 +14,7 @@ robot = DriveBase(left_motor, right_motor, wheel_diameter=55.5, axle_track=162)
 BLACK = 17
 WHITE = 57
 threshold = (BLACK + WHITE) / 2
-DRIVE_SPEED = 150
+DRIVE_SPEED = 100
 
 # Start following the line endlessly.
 while True:
@@ -27,4 +27,4 @@ while True:
     
 
     # Set the drive base speed and turn rate.
-    robot.drive(DRIVE_SPEED/((abs(turn_rate/20))+1), turn_rate)
+    robot.drive(DRIVE_SPEED/((abs(turn_rate)/100)+1), turn_rate)
