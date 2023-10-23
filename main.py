@@ -34,23 +34,50 @@ current_time = time.time()
 current_time_from_start = 0
 last_gyro_check_time = current_time
 gyro_angle = 0
+turn_list = []
+can_go_middle = 0
+turn_rate_multyplier = 1
 
 
-def rightTurn():
-    print("right")
-    gyro_sensor.reset_angle(0)
-
-
-def leftTurn():
-    print("left")
-    gyro_sensor.reset_angle(0)
+def writeTurn(isLeft):
+    turn_list.append(isLeft)
+    print(turn_list)
 
 
 def checkGyroMovements():
-    if gyro_sensor.angle() > 80:
-        rightTurn()
-    elif gyro_sensor.angle() < -80:
-        leftTurn()
+    if gyro_sensor.angle() > 85:
+        writeTurn(0)
+        gyro_sensor.reset_angle(0)
+    elif gyro_sensor.angle() < -85:
+        writeTurn(1)
+        gyro_sensor.reset_angle(0)
+
+
+def goMiddle():
+    global can_go_middle
+    global robot
+    global turn_rate_multyplier
+    print("going middle")
+    robot.stop()
+    robot.straight(100)
+    robot.turn(50)
+    turn_rate_multyplier = -1
+    can_go_middle = 0
+
+
+def tryGoMiddle():
+    global can_go_middle
+    last_three_items = turn_list[-3:]
+    if last_three_items == [0, 0, 1]:
+        goMiddle()
+
+
+def calculateGoMiddle():
+    global can_go_middle
+    last_three_items = turn_list[-3:]
+
+    if last_three_items == [1, 0, 1]:
+        can_go_middle = 1
 
 
 # Start following the line endlessly.
@@ -59,19 +86,19 @@ while True:
     current_time_from_start = current_time - START_TIME
     checkGyroMovements()
 
-    print(gyro_sensor.angle())
-
     if current_time_from_start > 80:
         ev3.speaker.beep()
         break
 
+    calculateGoMiddle()
+    if can_go_middle == 1:
+        tryGoMiddle()
+
     deviation = line_sensor.reflection() - threshold
 
     # Calculate the turn rate.
-    turn_rate = deviation * abs(deviation) / TURN_RATE_DIVIDER
+    turn_rate = deviation * abs(deviation) / TURN_RATE_DIVIDER * turn_rate_multyplier
     # print("turn rate: " + str(turn_rate))
 
     # Set the drive base speed and turn rate.
     robot.drive(DRIVE_SPEED, turn_rate)
-
-    wait(1000)
