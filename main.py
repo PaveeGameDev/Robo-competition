@@ -52,6 +52,18 @@ def checkGyroMovements():
     elif gyro_sensor.angle() < -80:
         leftTurn()
 
+##ROBO DPS (- Davis Positioning System) WIP
+class DPS_class:
+  def __init__(self, x, y):
+    self.time = time.time()
+    self.x = 0
+    self.y = 0
+
+    def calc(self, speed, turning_rate):
+        deltaT = self.time - time.time()
+        radius = (180 * speed)/(math.pi * turning_rate)
+        #x += 
+
 
 # Start following the line endlessly.
 while True:
