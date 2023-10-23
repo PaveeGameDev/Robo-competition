@@ -38,38 +38,28 @@ gyro_angle = 0
 
 def rightTurn():
     print("right")
+    gyro_sensor.reset_angle(0)
 
 
 def leftTurn():
     print("left")
-
-
-def fullTurn():
-    print("full")
+    gyro_sensor.reset_angle(0)
 
 
 def checkGyroMovements():
-    global gyro_angle
-    if abs(gyro_sensor.angle() - gyro_angle) > 170:
-        fullTurn()
-    elif gyro_sensor.angle() - gyro_angle > 80:
+    if gyro_sensor.angle() > 80:
         rightTurn()
-    elif gyro_sensor.angle() - gyro_angle < -80:
+    elif gyro_sensor.angle() < -80:
         leftTurn()
 
-    print(gyro_sensor.angle() - gyro_angle)
-
-    gyro_angle = gyro_sensor.angle()
-
-
+    
 # Start following the line endlessly.
 while True:
     current_time = time.time()
     current_time_from_start = current_time - START_TIME
-
-    if last_gyro_check_time + 2 < current_time:
-        checkGyroMovements()
-        last_gyro_check_time = current_time
+    checkGyroMovements()
+        
+    print(gyro_sensor.angle())
 
     if current_time_from_start > 80:
         ev3.speaker.beep()
