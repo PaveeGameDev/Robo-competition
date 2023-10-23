@@ -37,6 +37,7 @@ gyro_angle = 0
 turn_list = []
 can_go_middle = 0
 turn_rate_multyplier = 1
+going_middle = 0
 
 
 def writeTurn(isLeft):
@@ -57,19 +58,21 @@ def goMiddle():
     global can_go_middle
     global robot
     global turn_rate_multyplier
+    global going_middle
     print("going middle")
     robot.stop()
     robot.straight(100)
     robot.turn(50)
     turn_rate_multyplier = -1
     can_go_middle = 0
+    going_middle = 0
 
 
 def tryGoMiddle():
-    global can_go_middle
+    global going_middle
     last_three_items = turn_list[-3:]
     if last_three_items == [0, 0, 1]:
-        goMiddle()
+        going_middle = 1
 
 
 def calculateGoMiddle():
@@ -89,6 +92,9 @@ while True:
     if current_time_from_start > 80:
         ev3.speaker.beep()
         break
+
+    if current_time_from_start > 70 and going_middle == 1:
+        goMiddle()
 
     calculateGoMiddle()
     if can_go_middle == 1:
