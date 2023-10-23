@@ -82,7 +82,7 @@ def calculateGoMiddle():
     if last_three_items == [1, 0, 1]:
         can_go_middle = 1
 
-##ROBO DPS (- Davis Positioning System) WIP
+##ROBO DPS (- Davis Positioning System) WIP - potreba pracovat s otocenim roviny alpha
 class DPS_class:
   def __init__(self, x, y):
     self.time = time.time()
@@ -92,7 +92,11 @@ class DPS_class:
     def calc(self, speed, turning_rate):
         deltaT = self.time - time.time()
         radius = (180 * speed)/(math.pi * turning_rate)
-        #x += 
+        alpha = turning_rate * deltaT
+        self.x += math.sin(alpha) * radius
+        self.y += radius - math.cos(alpha) * radius
+        ##stred kruznice po ktere robot jede neni v bode 0 0 ale je o polomer ve smeru Y posunuty
+        self.time = time.time()
 
 
 # Start following the line endlessly.
