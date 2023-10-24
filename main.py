@@ -16,6 +16,7 @@ ev3 = EV3Brick()
 
 
 # constants
+DEG_TO_RAD = math.pi/180
 BLACK = 5
 WHITE = 30
 threshold = (BLACK + WHITE) / 2
@@ -97,25 +98,26 @@ class DPS_class:
             radius = (180 * speed)/(math.pi * turning_rate)
             alpha = turning_rate * deltaT
 
-            X = math.sin(alpha) * radius
+            X = math.sin(alpha * DEG_TO_RAD) * radius
             if 90 < turning_rate * deltaT and turning_rate * deltaT < 270
-                Y = radius + math.cos(alpha) * radius
+                Y = radius + math.cos(alpha * DEG_TO_RAD) * radius
             else:
-                Y = radius - math.cos(alpha) * radius
+                Y = radius - math.cos(alpha * DEG_TO_RAD) * radius
             ##stred kruznice po ktere robot jede neni v bode [0,0] ale je o polomer ve smeru Y posunuty
 
             if self.angle != 0:
                 radius2 = math.sqrt(Y**2 + X**2)
-                self.angle += math.asin(Y/radius2)
-                self.x += math.cos(self.angle) * radius2
-                self.y += math.sin(self.angle) * radius2
+                self.angle += math.asin(Y/radius2)/DEG_TO_RAD
+                self.x += math.cos(self.angle * DEG_TO_RAD) * radius2
+                self.y += math.sin(self.angle * DEG_TO_RAD) * radius2
             else:
+                self.angle += alpha
                 self.x += X
                 self.y += Y
             self.time = time.time()
         else:##robot jede po rovny primce, ktera je pod uhlem self.angle
-            self.x += math.cos(self.angle) * (speed * deltaT)
-            self.y += math.sin(self.angle) * (speed * deltaT)
+            self.x += math.cos(self.angle * DEG_TO_RAD) * (speed * deltaT)
+            self.y += math.sin(self.angle * DEG_TO_RAD) * (speed * deltaT)
             self.time = time.time()
 
 

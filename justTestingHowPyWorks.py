@@ -1,2 +1,4 @@
 import math
-print(math.sin(0)*10)
+print(math.pi)
+
+print(math.sin(90 * math.pi/180)*10)
