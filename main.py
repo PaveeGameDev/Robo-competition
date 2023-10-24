@@ -39,6 +39,7 @@ turn_list = []
 can_go_middle = False
 turn_rate_multiplier = 1
 isInMiddle = False
+droppedOff = False
 
 
 def writeTurn(isLeft):
@@ -67,14 +68,19 @@ def goMiddle():
     can_go_middle = False
     isInMiddle = True
 
+
 def dropOff():
+    global droppedOff
     print("Dropping the cubes rn")
+    droppedOff = True
+
 
 def calculateGoMiddle():
     global can_go_middle
     global isInMiddle
 
-    if isInMiddle: return
+    if isInMiddle:
+        return
     last_six_items = turn_list[-6:]
 
     if last_six_items == [1, 0, 1, 0, 0, 1]:
@@ -134,8 +140,8 @@ while True:
     if current_time_from_start > 10 and can_go_middle:
         goMiddle()
 
-    if isInMiddle and turn_list[-2] == [0,0]:
-
+    if isInMiddle and turn_list[-2:] == [0, 0] and not droppedOff:
+        dropOff()
 
     calculateGoMiddle()
 
