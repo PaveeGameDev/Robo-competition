@@ -97,61 +97,77 @@ class DPS_class:
         self.x = 0
         self.y = 0
 
-        def calc(self, speed, turning_rate):
-            deltaT = self.time - time.time()
-            if turning_rate != 0:
-                radius = (180 * speed) / (math.pi * turning_rate)
-                alpha = turning_rate * deltaT
+    def calc(self, speed, turning_rate):
+        deltaT = time.time() - self.time
+        self.time = time.time()
+        if turning_rate != 0:
+            radius = (180 * speed) / (math.pi * turning_rate)
+            alpha = turning_rate * deltaT
 
-                X = math.sin(alpha * DEG_TO_RAD) * radius
-                if 90 < turning_rate * deltaT and turning_rate * deltaT < 270:
-                    Y = radius + math.cos(alpha * DEG_TO_RAD) * radius
-                else:
-                    Y = radius - math.cos(alpha * DEG_TO_RAD) * radius
-                ##stred kruznice po ktere robot jede neni v bode [0,0] ale je o polomer ve smeru Y posunuty
+            X = math.sin(alpha * DEG_TO_RAD) * radius
+            if 90 < turning_rate * deltaT and turning_rate * deltaT < 270:
+                Y = radius + math.cos(alpha * DEG_TO_RAD) * radius
+            else:
+                Y = radius - math.cos(alpha * DEG_TO_RAD) * radius
+            ##stred kruznice po ktere robot jede neni v bode [0,0] ale je o polomer ve smeru Y posunuty
 
-                if self.angle != 0:
-                    radius2 = math.sqrt(Y**2 + X**2)
-                    self.angle += math.asin(Y / radius2) / DEG_TO_RAD
-                    self.x += math.cos(self.angle * DEG_TO_RAD) * radius2
-                    self.y += math.sin(self.angle * DEG_TO_RAD) * radius2
-                else:
-                    self.angle += alpha
-                    self.x += X
-                    self.y += Y
-                self.time = time.time()
-            else:  ##robot jede po rovny primce, ktera je pod uhlem self.angle
-                self.x += math.cos(self.angle * DEG_TO_RAD) * (speed * deltaT)
-                self.y += math.sin(self.angle * DEG_TO_RAD) * (speed * deltaT)
-                self.time = time.time()
+            if self.angle != 0:
+                radius2 = math.sqrt(Y**2 + X**2)
+                self.angle += math.asin(Y / radius2) / DEG_TO_RAD
+                self.x += math.cos(self.angle * DEG_TO_RAD) * radius2
+                self.y += math.sin(self.angle * DEG_TO_RAD) * radius2
+            else:
+                self.angle += alpha
+                self.x += X
+                self.y += Y
+        else:  ##robot jede po rovny primce, ktera je pod uhlem self.angle
+            self.x += math.cos(self.angle * DEG_TO_RAD) * speed * deltaT
+            self.y += math.sin(self.angle * DEG_TO_RAD) * speed * deltaT
+            
+        print(self.x)
 
 
 # Start following the line endlessly.
 DPS = DPS_class(0, 0)
+last_turn_rate = 0
+first_loop = False
+
 while True:
     current_time = time.time()
     current_time_from_start = current_time - START_TIME
-    checkGyroMovements()
+    """ checkGyroMovements() """
 
-    if current_time_from_start > 82:
+    if current_time_from_start > 10 and current_time_from_start < 12:
+        last_turn_rate = 45   
+    elif current_time_from_start > 20 and current_time_from_start < 22:
+        last_turn_rate = 45
+    else:
+        last_turn_rate = 0
+    
+    if current_time_from_start > 40:
         ev3.speaker.beep()
+        print(DPS.x, DPS.y, DPS.angle)
         break
 
-    if current_time_from_start > 10 and can_go_middle:
+    """ if current_time_from_start > 10 and can_go_middle:
         goMiddle()
 
     if isInMiddle and turn_list[-2:] == [0, 0] and not droppedOff:
-        dropOff()
+        dropOff() """
 
-    calculateGoMiddle()
+    """ calculateGoMiddle() """
 
     deviation = line_sensor.reflection() - threshold
 
     # Calculate the turn rate.
-    turn_rate = deviation * abs(deviation) / TURN_RATE_DIVIDER * turn_rate_multiplier
+    """ if first_loop:
+        last_turn_rate = turn_rate 
+    turn_rate = deviation * abs(deviation) / TURN_RATE_DIVIDER * turn_rate_multiplier """
     # print("turn rate: " + str(turn_rate))
 
     # updates robot positioning system !!!!.NEEDS to be JUST BEFORE .drive()!!!
-    # DPS.calc(DRIVE_SPEED, turn_rate)
+    DPS.calc(DRIVE_SPEED, last_turn_rate)
     # Set the drive base speed and turn rate.
-    robot.drive(DRIVE_SPEED, turn_rate)
+    robot.drive(DRIVE_SPEED, last_turn_rate)
+    
+    first_loop = True
