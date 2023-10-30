@@ -9,6 +9,7 @@ import math
 # Initialize everything
 left_motor = Motor(Port.B)
 right_motor = Motor(Port.A)
+grabber_motor = Motor(Port.C)
 line_sensor = ColorSensor(Port.S1)
 gyro_sensor = GyroSensor(Port.S2)
 ev3 = EV3Brick()
@@ -16,14 +17,15 @@ ev3 = EV3Brick()
 
 # constants
 DEG_TO_RAD = math.pi / 180
-BLACK = 5
-WHITE = 30
+BLACK = 15
+WHITE = 40
 threshold = (BLACK + WHITE) / 2
 DRIVE_SPEED = 100
 TURN_RATE_DIVIDER = 3
 WHEEL_DIAMETER = 55.5
 AXLE_TRACK = 150
 START_TIME = time.time()
+GRAB_SPEED = 500
 
 
 # second initialization
@@ -35,6 +37,14 @@ current_time = time.time()
 current_time_from_start = 0
 gyro_angle = 0
 turn_rate_multiplier = 1
+droppedOff = False
+
+def dropOff():
+    global droppedOff
+    droppedOff = True
+    
+    print('dropping off')
+
 
 ##ROBO DPS (- Davis Positioning System)
 class DPS_class:
@@ -102,4 +112,10 @@ while True:
     turn_rate = deviation * abs(deviation) / TURN_RATE_DIVIDER * turn_rate_multiplier
 
     # Updates robot positioning system and tells robot to drive
-    DPS.calc(DRIVE_SPEED, rate)
+    DPS.calc(DRIVE_SPEED, turn_rate) #TODO: proc tady bylo rate a ne turn_rate?
+    
+    grabber_motor.run(GRAB_SPEED)
+    
+    
+    if current_time_from_start > 2 and not droppedOff:
+        dropOff()
