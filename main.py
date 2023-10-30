@@ -37,14 +37,25 @@ current_time = time.time()
 current_time_from_start = 0
 gyro_angle = 0
 turn_rate_multiplier = 1
-droppedOff = False
+wentToMiddle = False
+gettingCover = False
+
+def getCover():
+    global gettingCover
+    gettingCover = True
+    #TODO: implement
+    
 
 def dropOff():
-    global droppedOff
-    droppedOff = True
-    
     print('dropping off')
+    time.sleep(10)
+    getCover()
 
+def needToGoMiddle():
+    global wentToMiddle
+    wentToMiddle = True
+    #TODO: implement
+    dropOff()
 
 ##ROBO DPS (- Davis Positioning System)
 class DPS_class:
@@ -116,6 +127,9 @@ while True:
     
     grabber_motor.run(GRAB_SPEED)
     
-    
-    if current_time_from_start > 2 and not droppedOff:
-        dropOff()
+    if current_time_from_start > 10 and not wentToMiddle:
+        needToGoMiddle()
+        
+    if current_time_from_start > 83 and gettingCover:
+        ev3.speaker.beep()
+        break
