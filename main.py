@@ -3,6 +3,7 @@ from pybricks.ev3devices import Motor, ColorSensor, GyroSensor
 from pybricks.parameters import Port
 from pybricks.robotics import DriveBase
 from pybricks.hubs import EV3Brick
+from pybricks.tools import wait, StopWatch
 import time
 import math
 
@@ -13,7 +14,7 @@ grabber_motor = Motor(Port.C)
 line_sensor = ColorSensor(Port.S1)
 gyro_sensor = GyroSensor(Port.S2)
 ev3 = EV3Brick()
-
+stop_watch = StopWatch()
 
 # constants
 DEG_TO_RAD = math.pi / 180
@@ -26,6 +27,9 @@ WHEEL_DIAMETER = 55.5
 AXLE_TRACK = 150
 START_TIME = time.time()
 GRAB_SPEED = 500
+DROP_OFF_SPEED = 100
+TIME_TO_MIDDLE = 10 * 1000
+TIME_TO_STOP = 83 * 1000
 
 
 # second initialization
@@ -40,22 +44,26 @@ turn_rate_multiplier = 1
 wentToMiddle = False
 gettingCover = False
 
+
 def getCover():
     global gettingCover
     gettingCover = True
-    #TODO: implement
-    
+    print("getting cover")
+    # TODO: implement
+
 
 def dropOff():
-    print('dropping off')
-    time.sleep(10)
+    print("dropping off")
+    grabber_motor.run_time(DROP_OFF_SPEED, 10 * 1000, then=Stop.HOLD, wait=True)
     getCover()
+
 
 def needToGoMiddle():
     global wentToMiddle
     wentToMiddle = True
-    #TODO: implement
+    # TODO: implement
     dropOff()
+
 
 ##ROBO DPS (- Davis Positioning System)
 class DPS_class:
@@ -78,11 +86,11 @@ class DPS_class:
         if (abs(difference) >= 2):
             print('fixing')
             beta += difference
-        
+
         if self.turning != 0:
             radius = (180 * self.speed) / (math.pi * self.turning)
             gama = (180 - beta) / 2
-            b = 2 * math.sin((beta/2) * DEG_TO_RAD) * radius
+            b = 2 * math.sin((beta / 2) * DEG_TO_RAD) * radius
             self.x += b * math.cos((gama - self.zelta) * DEG_TO_RAD)
             self.y += b * math.sin((gama - self.zelta) * DEG_TO_RAD)
             self.zelta += beta
@@ -90,7 +98,7 @@ class DPS_class:
         else:  ##robot jede po rovny primce, ktera je pod uhlem self.angle
             self.x += math.cos(self.angle * DEG_TO_RAD) * self.speed * deltaT
             self.y += math.sin(self.angle * DEG_TO_RAD) * self.speed * deltaT
-        
+
         self.speed = speed
         self.turning = turning_rate
     
@@ -121,7 +129,7 @@ class DPS_class:
 DPS = DPS_class(0, 0)
 #rate = -22.5
 check = False
-print(DPS.x,DPS.y,DPS.zelta,DPS.angle)
+print(DPS.x, DPS.y, DPS.zelta, DPS.angle)
 
 while True:
     current_time = time.time()
@@ -131,9 +139,9 @@ while True:
         check = True
         rate = 0
         Y = DPS.y
-        print(DPS.x,DPS.y,DPS.zelta,DPS.angle)
-    
-    if check and Y * 2 > DPS.y :
+        print(DPS.x, DPS.y, DPS.zelta, DPS.angle)
+
+    if check and Y * 2 > DPS.y:
         robot.stop()
         ev3.speaker.beep()
         print(DPS.x,DPS.y,DPS.zelta,DPS.angle)
@@ -158,7 +166,7 @@ while True:
     
     if current_time_from_start > 10 and not wentToMiddle:
         needToGoMiddle()
-        
-    if current_time_from_start > 83 and gettingCover:
+
+    if stop_watch.time > TIME_TO_STOP and gettingCover:
         ev3.speaker.beep()
         break """
