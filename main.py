@@ -67,7 +67,7 @@ def needToGoMiddle():
 
 ##ROBO DPS (- Davis Positioning System)
 class DPS_class:
-    def __init__(self, x, y):
+    def __init__(self, x, y):#distance in mm, time in s, angle in degrees
         self.time = time.time()
         self.angle = 0
         self.zelta = -90
@@ -82,9 +82,9 @@ class DPS_class:
         robot.drive(speed, turning_rate)
 
         beta = self.turning * deltaT
-        difference = gyro_sensor.angle() - (self.zelta + beta + 90)
-        if abs(difference) >= 3:
-            print("fixing")
+        difference = gyro_sensor.angle() - (self.angle + beta)
+        if (abs(difference) >= 2):
+            print('fixing')
             beta += difference
 
         if self.turning != 0:
@@ -101,11 +101,33 @@ class DPS_class:
 
         self.speed = speed
         self.turning = turning_rate
+    
+    def trajectory(self, x, y):
+        deltaX = x - self.x
+        deltaY = y - self.y
+        if deltaX == 0:
+            if deltaY > 0:
+                alpha = 90
+            else:
+                aplha = -90
+        else:
+            m = deltaY / deltaX
+            alpha = math.atan(m) / DEG_TO_RAD
 
+        if alpha + 2 >= self.angle % 360 and alpha - 2 <= self.angle % 360:
+            self.calc(speed = 200, turning_rate = 0)
+        else:
+            deltaAngle = alpha - (self.angle % 360)
+            self.calc(speed = 0, turning_rate = deltaAngle * 2) #ten nasobitel se bude menit - musi se najit nelepsi hodnota
+
+        if self.x + 5 > x and self.x - 5 < x and self.y + 5 > y and self.y - 5 < y:
+            return True
+        else:
+            return False
 
 # Start following the line endlessly.
 DPS = DPS_class(0, 0)
-rate = -22.5
+#rate = -22.5
 check = False
 print(DPS.x, DPS.y, DPS.zelta, DPS.angle)
 
@@ -113,7 +135,7 @@ while True:
     current_time = time.time()
     current_time_from_start = current_time - START_TIME
 
-    if not check and gyro_sensor.angle() < -90:
+    """ if not check and gyro_sensor.angle() < -90:
         check = True
         rate = 0
         Y = DPS.y
@@ -122,8 +144,8 @@ while True:
     if check and Y * 2 > DPS.y:
         robot.stop()
         ev3.speaker.beep()
-        print(DPS.x, DPS.y, DPS.zelta, DPS.angle)
-        break
+        print(DPS.x,DPS.y,DPS.zelta,DPS.angle)
+        break """
 
     deviation = line_sensor.reflection() - threshold
 
@@ -131,13 +153,20 @@ while True:
     turn_rate = deviation * abs(deviation) / TURN_RATE_DIVIDER * turn_rate_multiplier
 
     # Updates robot positioning system and tells robot to drive
-    DPS.calc(DRIVE_SPEED, turn_rate)
+    #DPS.calc(DRIVE_SPEED, turn_rate)
+    back = DPS.trajectory(1000, 1000)
 
-    grabber_motor.run(GRAB_SPEED)
+    if back:
+        robot.stop()
+        ev3.speaker.beep()
+        print(DPS.x,DPS.y,DPS.zelta,DPS.angle)
+        break
 
-    if stop_watch.time > TIME_TO_MIDDLE and not wentToMiddle:
+    """ grabber_motor.run(GRAB_SPEED)
+    
+    if current_time_from_start > 10 and not wentToMiddle:
         needToGoMiddle()
 
     if stop_watch.time > TIME_TO_STOP and gettingCover:
         ev3.speaker.beep()
-        break
+        break """
