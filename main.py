@@ -30,6 +30,23 @@ GRAB_SPEED = 500
 DROP_OFF_SPEED = 100
 TIME_TO_MIDDLE = 10 * 1000
 TIME_TO_STOP = 83 * 1000
+DISTANCE_MULTIPLIER = 280
+
+
+# dodelat 6, 7, 9
+# array of points
+points = [
+    [[1, 0.5], [-1, 0], [2, 1], [3, 1]],
+    [[-1, 0], [4, 1], [0, 0.5], [-1, 0]],
+    [[0, 1], [7, 1], [9, 1], [8, 1]],
+    [[-1, 0], [0, 1], [-1, 0], [-1, 0]],
+    [[5, 1], [6, 1], [7, 1.5], [5, 1]],
+    [[-1, 0], [-1, 0], [4, 1], [-1, 0]],
+    [[-1, 0], [-1, 0], [-1, 0], [4, 1]],
+    [[4, 1.5], [-1, 0], [-1, 0], [2, 1]],
+    [[-1, 0], [2, 1], [-1, 0], [-1, 0]],
+    [[2, 1], [-1, 0], [-1, 0], [-1, 0]],
+]
 
 
 # second initialization
@@ -49,7 +66,7 @@ def getCover():
     global gettingCover
     gettingCover = True
     print("getting cover")
-    # TODO: implement
+    # TODO: implement david
 
 
 def dropOff():
@@ -61,13 +78,13 @@ def dropOff():
 def needToGoMiddle():
     global wentToMiddle
     wentToMiddle = True
-    # TODO: implement
+    # TODO: implement david
     dropOff()
 
 
 ##ROBO DPS (- Davis Positioning System)
 class DPS_class:
-    def __init__(self, x, y):#distance in mm, time in s, angle in degrees
+    def __init__(self, x, y):  # distance in mm, time in s, angle in degrees
         self.time = time.time()
         self.angle = 0
         self.zelta = -90
@@ -83,8 +100,8 @@ class DPS_class:
 
         beta = self.turning * deltaT
         difference = gyro_sensor.angle() - (self.angle + beta)
-        if (abs(difference) >= 2):
-            print('fixing')
+        if abs(difference) >= 2:
+            print("fixing")
             beta += difference
 
         if self.turning != 0:
@@ -101,7 +118,7 @@ class DPS_class:
 
         self.speed = speed
         self.turning = turning_rate
-    
+
     def trajectory(self, x, y):
         deltaX = x - self.x
         deltaY = y - self.y
@@ -115,19 +132,22 @@ class DPS_class:
             alpha = math.atan(m) / DEG_TO_RAD
 
         if alpha + 2 >= self.angle % 360 and alpha - 2 <= self.angle % 360:
-            self.calc(speed = 200, turning_rate = 0)
+            self.calc(speed=200, turning_rate=0)
         else:
             deltaAngle = alpha - (self.angle % 360)
-            self.calc(speed = 0, turning_rate = deltaAngle * 2) #ten nasobitel se bude menit - musi se najit nelepsi hodnota
+            self.calc(
+                speed=0, turning_rate=deltaAngle * 2
+            )  # ten nasobitel se bude menit - musi se najit nelepsi hodnota
 
         if self.x + 5 > x and self.x - 5 < x and self.y + 5 > y and self.y - 5 < y:
             return True
         else:
             return False
 
+
 # Start following the line endlessly.
 DPS = DPS_class(0, 0)
-#rate = -22.5
+# rate = -22.5
 check = False
 print(DPS.x, DPS.y, DPS.zelta, DPS.angle)
 
@@ -153,13 +173,13 @@ while True:
     turn_rate = deviation * abs(deviation) / TURN_RATE_DIVIDER * turn_rate_multiplier
 
     # Updates robot positioning system and tells robot to drive
-    #DPS.calc(DRIVE_SPEED, turn_rate)
+    # DPS.calc(DRIVE_SPEED, turn_rate)
     back = DPS.trajectory(1000, 1000)
 
     if back:
         robot.stop()
         ev3.speaker.beep()
-        print(DPS.x,DPS.y,DPS.zelta,DPS.angle)
+        print(DPS.x, DPS.y, DPS.zelta, DPS.angle)
         break
 
     """ grabber_motor.run(GRAB_SPEED)
