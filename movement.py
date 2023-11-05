@@ -186,8 +186,8 @@ points = [
 ]
 
 # Define the current and target points
-current_point = 6
-target_point = 8
+current_point = 24
+target_point = 33
 
 # Find the fastest routes
 fastest_routes = find_fastest_routes(points, current_point, target_point)
@@ -227,12 +227,9 @@ print(getPathWithLessTurns(fastest_routes, points))
 
 
 def getDistanceToPointFromPoint(points, current_point, target_point):
-    distance = 0
     for i in range(len(points[current_point])):
         if points[current_point][i][0] == target_point:
-            distance = points[current_point][i][1]
-            break
-    return distance
+            return points[current_point][i][1]
 
 
 def newPath(points, route):
@@ -275,7 +272,6 @@ def getDirectionFromPointToPoint(route, newRoute):
     direction = []
     print(route, newRoute)
     for x in range(len(newRoute)):
-        print(x)
         for i in range(len(points[route[x]])):
             if points[route[x]][i][0] == route[x + 1]:
                 direction.append([i, newRoute[x][1]])
@@ -290,6 +286,8 @@ print(
     )
 )
 
+
+print(getDistanceToPointFromPoint(points, 29, 30))
 
 # def find_fastest_route_with_min_turns(points, current_point, target_point):
 #     def dfs(current, path, time, turns):
