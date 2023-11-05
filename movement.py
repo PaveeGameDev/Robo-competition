@@ -153,15 +153,41 @@ points = [
     [[-1, 0], [0, 1], [-1, 0], [-1, 0]],
     [[5, 1], [6, 1], [7, 1.5], [1, 1]],
     [[-1, 0], [-1, 0], [4, 1], [-1, 0]],
-    [[-1, 0], [-1, 0], [-1, 0], [4, 1]],
-    [[4, 1.5], [-1, 0], [-1, 0], [2, 1]],
+    [[11, 1], [10, 1], [12, 1.5], [4, 1]],
+    [[4, 1.5], [12, 1], [18, 1.5], [2, 1]],
     [[-1, 0], [2, 1], [-1, 0], [-1, 0]],
-    [[2, 1], [-1, 0], [-1, 0], [-1, 0]],
+    [[2, 1], [-1, 0], [14, 0.5], [13, 1]],
+    [[15, 1], [16, 1], [17, 1.5], [6, 1]],
+    [[-1, 0], [-1, 0], [6, 1], [-1, 0]],
+    [[6, 1.5], [17, 1], [20, 1.5], [7, 1]],
+    [[-1, 0], [9, 1], [-1, 0], [-1, 0]],
+    [[9, 0.5], [18, 1], [-1, 0], [-1, 0]],
+    [[-1, 0], [-1, 0], [10, 1], [-1, 0]],
+    [[24, 1], [28, 1], [25, 1.5], [10, 1]],
+    [[10, 1.5], [25, 1], [22, 1.5], [12, 1]],
+    [[7, 1.5], [20, 1], [19, 1], [14, 1]],
+    [[18, 1], [-1, 0], [-1, 0], [-1, 0]],
+    [[12, 1.5], [22, 1], [21, 1], [18, 1]],
+    [[20, 1], [-1, 0], [-1, 0], [-1, 0]],
+    [[17, 1.5], [26, 1], [23, 1], [20, 1]],
+    [[22, 1], [-1, 0], [-1, 0], [-1, 0]],
+    [[-1, 0], [-1, 0], [16, 1], [-1, 0]],
+    [[16, 1.5], [29, 1], [26, 1.5], [17, 1]],
+    [[25, 1.5], [34, 1], [27, 1], [22, 1]],
+    [[26, 1], [-1, 0], [-1, 0], [-1, 0]],
+    [[-1, 0], [-1, 0], [35, 0.5], [16, 1]],
+    [[35, 1], [32, 1], [30, 1], [25, 1]],
+    [[29, 1], [33, 1], [34, 0.5], [-1, 0]],
+    [[-1, 0], [-1, 0], [-1, 0], [35, 1]],
+    [[-1, 0], [-1, 0], [-1, 0], [29, 1]],
+    [[-1, 0], [-1, 0], [-1, 0], [30, 1]],
+    [[30, 0.5], [-1, 0], [-1, 0], [26, 1]],
+    [[28, 0.5], [31, 1], [29, 1], [-1, 0]],
 ]
 
 # Define the current and target points
 current_point = 6
-target_point = 9
+target_point = 8
 
 # Find the fastest routes
 fastest_routes = find_fastest_routes(points, current_point, target_point)
@@ -229,14 +255,14 @@ def newPath(points, route):
 
         if abs(current_index - next_index) != 0:
             newPath.append([next_point, distance])
-            distance = 0
+            distance = getDistanceToPointFromPoint(points, next_point, next_next_point)
         else:
             distance += points[current_point][current_index][1]
 
     newPath.append(
         [
             route[-1],
-            distance + getDistanceToPointFromPoint(points, route[-2], route[-1]),
+            distance,
         ]
     )
     return newPath
@@ -246,10 +272,24 @@ print(newPath(points, getPathWithLessTurns(fastest_routes, points)))
 
 
 def getDirectionFromPointToPoint(route, newRoute):
-    
+    direction = []
+    print(route, newRoute)
+    for x in range(len(newRoute)):
+        print(x)
+        for i in range(len(points[route[x]])):
+            if points[route[x]][i][0] == route[x + 1]:
+                direction.append([i, newRoute[x][1]])
+
+    return direction
 
 
-print(getDirectionFromPointToPoint(getPathWithLessTurns(fastest_routes, points),    ))
+print(
+    getDirectionFromPointToPoint(
+        getPathWithLessTurns(fastest_routes, points),
+        newPath(points, getPathWithLessTurns(fastest_routes, points)),
+    )
+)
+
 
 # def find_fastest_route_with_min_turns(points, current_point, target_point):
 #     def dfs(current, path, time, turns):
