@@ -9,7 +9,7 @@ import math
 # Initialize everything
 left_motor = Motor(Port.B)
 right_motor = Motor(Port.A)
-grabber_motor = Motor(Port.C)
+#grabber_motor = Motor(Port.C)
 line_sensor = ColorSensor(Port.S1)
 gyro_sensor = GyroSensor(Port.S2)
 ev3 = EV3Brick()
@@ -94,6 +94,9 @@ class DPS_class:
         self.speed = speed
         self.turning = turning_rate
     
+    #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-
+    #--#-#-#-#-#-#-#-#-#-#-#-#-#-#
+
     def trajectory(self, x, y):
         deltaX = x - self.x
         deltaY = y - self.y
@@ -101,15 +104,19 @@ class DPS_class:
             if deltaY > 0:
                 alpha = 90
             else:
-                aplha = -90
+                alpha = -90
         else:
             m = deltaY / deltaX
             alpha = math.atan(m) / DEG_TO_RAD
 
         if alpha + 2 >= self.angle % 360 and alpha - 2 <= self.angle % 360:
+            print("driving")
+            print(alpha,deltaY,deltaX)
             self.calc(speed = 200, turning_rate = 0)
         else:
             deltaAngle = alpha - (self.angle % 360)
+            print("turning")
+            print(alpha,deltaY,deltaX)
             self.calc(speed = 0, turning_rate = deltaAngle * 2) #ten nasobitel se bude menit - musi se najit nelepsi hodnota
 
         if self.x + 5 > x and self.x - 5 < x and self.y + 5 > y and self.y - 5 < y:
@@ -146,7 +153,7 @@ while True:
 
     # Updates robot positioning system and tells robot to drive
     #DPS.calc(DRIVE_SPEED, turn_rate)
-    back = DPS.trajectory(1000, 1000)
+    back = DPS.trajectory(0, 1000)
 
     if back:
         robot.stop()
