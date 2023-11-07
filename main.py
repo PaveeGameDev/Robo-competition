@@ -64,7 +64,12 @@ def needToGoMiddle():
     # TODO: implement
     dropOff()
 
-
+##Math functions
+def mod(a,b):
+    if a < 0 and b > 0 or a > 0 and b < 0:
+        return a % -b
+    else:
+        return a % b
 ##ROBO DPS (- Davis Positioning System)
 class DPS_class:
     def __init__(self, x, y):#distance in mm, time in s, angle in degrees
@@ -125,23 +130,23 @@ class DPS_class:
         if deltaX < 0:
             alpha += 180
 
-        if alpha + 2 >= self.angle % 360 and alpha - 2 <= self.angle % 360:
+        if alpha + 2 >= mod(self.angle, 360) and alpha - 2 <= mod(self.angle, 360):
             print("    driving")
             print(alpha,deltaX,deltaY)
             print(self.angle,self.x,self.y)
             self.calc(speed = 200, turning_rate = 0)
-        elif self.pairAngle(alpha + 2) >= self.angle % 360 and self.pairAngle(alpha - 2) <= self.angle % 360:
+        elif self.pairAngle(alpha + 2) >= mod(self.angle, 360) and self.pairAngle(alpha - 2) <= mod(self.angle, 360):
             print("    driving2")
             print(alpha,deltaX,deltaY)
             print(self.angle,self.x,self.y)
             self.calc(speed = 200, turning_rate = 0)
         else:
-            deltaAngle = alpha - (self.angle % 360)
+            deltaAngle = alpha - mod(self.angle, 360)
             print("    turning")
             print(alpha,deltaX,deltaY)
             print(self.angle,self.x,self.y)
             print(deltaAngle)
-            print(self.angle % 360)
+            print(mod(self.angle, 360))
             self.calc(speed = 0, turning_rate = deltaAngle * 2) #ten nasobitel se bude menit - musi se najit nelepsi hodnota
 
         if self.x + 5 > x and self.x - 5 < x and self.y + 5 > y and self.y - 5 < y:
