@@ -80,11 +80,12 @@ class DPS_class:
         deltaT = time.time() - self.time
         self.time = time.time()
         robot.drive(speed, turning_rate)
+        print("time " + str(deltaT))
 
         beta = self.turning * deltaT
         difference = gyro_sensor.angle() - (self.angle + beta)
         if (abs(difference) >= 2):
-            print('fixing')
+            print('fixing ' + str(difference))
             beta += difference
 
         if self.turning != 0:
@@ -104,7 +105,7 @@ class DPS_class:
     
     #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-
     #--#-#-#-#-#-#-#-#-#-#-#-#-#-#
-    def pairAngle(a):
+    def pairAngle(self,a):
         if a < 0:
             return a + 360
         else:
@@ -122,20 +123,25 @@ class DPS_class:
             m = deltaY / deltaX
             alpha = math.atan(m) / DEG_TO_RAD
         if deltaX < 0:
-            aplha += 180:
+            alpha += 180
 
         if alpha + 2 >= self.angle % 360 and alpha - 2 <= self.angle % 360:
-            print("driving")
-            print(alpha,deltaY,deltaX)
+            print("    driving")
+            print(alpha,deltaX,deltaY)
+            print(self.angle,self.x,self.y)
             self.calc(speed = 200, turning_rate = 0)
-        elif pairAngle(alpha + 2) >= self.angle % 360 and pairAngle(alpha - 2) <= self.angle % 360:
-            print("driving")
-            print(alpha,deltaY,deltaX)
+        elif self.pairAngle(alpha + 2) >= self.angle % 360 and self.pairAngle(alpha - 2) <= self.angle % 360:
+            print("    driving2")
+            print(alpha,deltaX,deltaY)
+            print(self.angle,self.x,self.y)
             self.calc(speed = 200, turning_rate = 0)
         else:
             deltaAngle = alpha - (self.angle % 360)
-            print("turning")
-            print(alpha,deltaY,deltaX)
+            print("    turning")
+            print(alpha,deltaX,deltaY)
+            print(self.angle,self.x,self.y)
+            print(deltaAngle)
+            print(self.angle % 360)
             self.calc(speed = 0, turning_rate = deltaAngle * 2) #ten nasobitel se bude menit - musi se najit nelepsi hodnota
 
         if self.x + 5 > x and self.x - 5 < x and self.y + 5 > y and self.y - 5 < y:
@@ -172,7 +178,7 @@ while True:
 
     # Updates robot positioning system and tells robot to drive
     #DPS.calc(DRIVE_SPEED, turn_rate)
-    back = DPS.trajectory(0, 1000)
+    back = DPS.trajectory(0, -1000)
 
     if back:
         robot.stop()
