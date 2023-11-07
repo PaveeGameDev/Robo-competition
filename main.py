@@ -104,6 +104,11 @@ class DPS_class:
     
     #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-
     #--#-#-#-#-#-#-#-#-#-#-#-#-#-#
+    def pairAngle(a):
+        if a < 0:
+            return a + 360
+        else:
+            return a - 360
 
     def trajectory(self, x, y):
         deltaX = x - self.x
@@ -116,8 +121,14 @@ class DPS_class:
         else:
             m = deltaY / deltaX
             alpha = math.atan(m) / DEG_TO_RAD
+        if deltaX < 0:
+            aplha += 180:
 
         if alpha + 2 >= self.angle % 360 and alpha - 2 <= self.angle % 360:
+            print("driving")
+            print(alpha,deltaY,deltaX)
+            self.calc(speed = 200, turning_rate = 0)
+        elif pairAngle(alpha + 2) >= self.angle % 360 and pairAngle(alpha - 2) <= self.angle % 360:
             print("driving")
             print(alpha,deltaY,deltaX)
             self.calc(speed = 200, turning_rate = 0)
