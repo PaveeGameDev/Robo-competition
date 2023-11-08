@@ -68,8 +68,8 @@ points = [
 ]
 
 # Define the current and target points
-current_point = 3
-target_point = 31
+current_point = 13
+target_point = 33
 
 # Find the fastest routes
 fastest_routes = find_fastest_routes(points, current_point, target_point)
@@ -152,21 +152,45 @@ print(newPath(points, getPathWithLessTurns(fastest_routes, points)))
 
 def getDirectionFromPointToPoint(route, newRoute):
     direction = []
-    print(route, newRoute)
+    print(newRoute[0])
     for x in range(len(newRoute)):
-        for i in range(len(points[route[x]])):
-            if points[route[x]][i][0] == route[x + 1]:
-                direction.append([i, newRoute[x][1]])
+        direction.append(
+            [
+                getDirectionFromOnePointToPoint(
+                    newRoute[x][0],
+                    getNextPointFromPoint(route, newRoute[x][0]),
+                ),
+                newRoute[x][1],
+            ]
+        )
+        # for i in range(len(points[route[x]])):
+        #     if points[route[x]][i][0] == route[x + 1]:
+        #         direction.append([i, newRoute[x][1]])
 
     return direction
 
 
-print(
-    getDirectionFromPointToPoint(
-        getPathWithLessTurns(fastest_routes, points),
-        newPath(points, getPathWithLessTurns(fastest_routes, points)),
-    )
-)
+# je to jenom posunuty o jedno doleva
+
+
+def getNextPointFromPoint(route, point):
+    for i in range(len(route)):
+        if route[i] == point:
+            return route[i + 1]
+
+
+print("getNe", getNextPointFromPoint(getPathWithLessTurns(fastest_routes, points), 34))
+
+
+def getDirectionFromOnePointToPoint(pointOne, pointTwo):
+    print(pointOne, pointTwo)
+    for i in range(4):
+        if points[pointOne][i][0] == pointTwo:
+            print("directions", pointOne, pointTwo, i)
+            return i
+
+
+print("get dir", getDirectionFromOnePointToPoint(13, 9))
 
 print(
     getDirectionFromPointToPoint(
