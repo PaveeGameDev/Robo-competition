@@ -1,3 +1,72 @@
+#!/usr/bin/env pybricks-micropython
+from pybricks.ev3devices import Motor, ColorSensor, GyroSensor
+from pybricks.parameters import Port
+from pybricks.robotics import DriveBase
+from pybricks.hubs import EV3Brick
+from pybricks.tools import wait, StopWatch
+import time
+import math
+
+# Initialize everything
+left_motor = Motor(Port.B)
+right_motor = Motor(Port.A)
+grabber_motor = Motor(Port.C)
+line_sensor = ColorSensor(Port.S1)
+gyro_sensor = GyroSensor(Port.S2)
+ev3 = EV3Brick()
+stop_watch = StopWatch()
+
+# constants
+DEG_TO_RAD = math.pi / 180
+BLACK = 15
+WHITE = 40
+threshold = (BLACK + WHITE) / 2
+DRIVE_SPEED = 100
+TURN_RATE_DIVIDER = 3
+WHEEL_DIAMETER = 55.5
+AXLE_TRACK = 150
+START_TIME = time.time()
+GRAB_SPEED = 500
+DROP_OFF_SPEED = 100
+TIME_TO_MIDDLE = 10 * 1000
+TIME_TO_STOP = 83 * 1000
+DISTANCE_MULTIPLIER = 280
+
+
+# second initialization
+robot = DriveBase(
+    left_motor, right_motor, wheel_diameter=WHEEL_DIAMETER, axle_track=AXLE_TRACK
+)
+
+current_time = time.time()
+current_time_from_start = 0
+gyro_angle = 0
+turn_rate_multiplier = 1
+wentToMiddle = False
+gettingCover = False
+current_point = 0
+
+
+def getCover():
+    global gettingCover
+    gettingCover = True
+    print("getting cover")
+    # TODO: implement david
+
+
+def dropOff():
+    print("dropping off")
+    grabber_motor.run_time(DROP_OFF_SPEED, 10 * 1000, then=Stop.HOLD, wait=True)
+    getCover()
+
+
+def needToGoMiddle():
+    global wentToMiddle
+    wentToMiddle = True
+    # TODO: implement david
+    dropOff()
+
+
 def find_fastest_routes(points, current_point, target_point):
     def dfs(current, path, time):
         if current == target_point:
@@ -179,9 +248,6 @@ def getDirectionFromPointToPoint(route, newRoute):
                     newRoute[x][1],
                 ]
             )
-        # for i in range(len(points[route[x]])):
-        #     if points[route[x]][i][0] == route[x + 1]:
-        #         direction.append([i, newRoute[x][1]])
 
     return direction
 
@@ -211,3 +277,55 @@ print(
         newPath(points, getPathWithLessTurns(fastest_routes, points)),
     )
 )
+
+
+def rotate(current, wanted):
+    if wanted == 0:
+        if current == 1:
+            return -90
+        elif current == 2:
+            return 180
+        elif current == 3:
+            return 90
+    elif wanted == 1:
+        if current == 0:
+            return 90
+        elif current == 2:
+            return -90
+        elif current == 3:
+            return 180
+    elif wanted == 2:
+        if current == 0:
+            return 180
+        elif current == 1:
+            return 90
+        elif current == 3:
+            return -90
+    elif wanted == 3:
+        if current == 0:
+            return -90
+        elif current == 1:
+            return 180
+        elif current == 2:
+            return 90
+
+
+while True:
+    current_time = time.time()
+    current_time_from_start = current_time - START_TIME
+
+    deviation = line_sensor.reflection() - threshold
+
+    # Calculate the turn rate.
+    turn_rate = deviation * abs(deviation) / TURN_RATE_DIVIDER * turn_rate_multiplier
+
+    robot.drive(DRIVE_SPEED, turn_rate)
+
+    grabber_motor.run(GRAB_SPEED)
+
+    if current_time_from_start > 10 and not wentToMiddle:
+        needToGoMiddle()
+
+    if stop_watch.time > TIME_TO_STOP and gettingCover:
+        ev3.speaker.beep()
+        break
