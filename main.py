@@ -30,6 +30,7 @@ GRAB_SPEED = 500
 DROP_OFF_SPEED = 100
 TIME_TO_MIDDLE = 10 * 1000
 TIME_TO_STOP = 83 * 1000
+DISTANCE_MULTIPLIER = 280
 
 
 # second initialization
@@ -49,7 +50,7 @@ def getCover():
     global gettingCover
     gettingCover = True
     print("getting cover")
-    # TODO: implement
+    # TODO: implement david
 
 
 def dropOff():
@@ -61,7 +62,7 @@ def dropOff():
 def needToGoMiddle():
     global wentToMiddle
     wentToMiddle = True
-    # TODO: implement
+    # TODO: implement david
     dropOff()
 
 ##Math functions
@@ -72,7 +73,7 @@ def mod(a,b):
         return a % b
 ##ROBO DPS (- Davis Positioning System)
 class DPS_class:
-    def __init__(self, x, y):#distance in mm, time in s, angle in degrees
+    def __init__(self, x, y):  # distance in mm, time in s, angle in degrees
         self.time = time.time()
         self.angle = 0
         self.zelta = -90
@@ -91,7 +92,6 @@ class DPS_class:
         difference = gyro_sensor.angle() - (self.angle + beta)
         if (abs(difference) >= 2):
             print('fixing ' + str(difference))
-            beta += difference
 
         if self.turning != 0:
             radius = (180 * self.speed) / (math.pi * self.turning)
@@ -107,7 +107,6 @@ class DPS_class:
 
         self.speed = speed
         self.turning = turning_rate
-    
     #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-
     #--#-#-#-#-#-#-#-#-#-#-#-#-#-#
     def pairAngle(self,a):
@@ -154,9 +153,10 @@ class DPS_class:
         else:
             return False
 
+
 # Start following the line endlessly.
 DPS = DPS_class(0, 0)
-#rate = -22.5
+# rate = -22.5
 check = False
 print(DPS.x, DPS.y, DPS.zelta, DPS.angle)
 destination = [points[0][0],points[0][1]]
