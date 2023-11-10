@@ -17,6 +17,10 @@ Usonic_sensor = UltrasonicSensor(Port.S3)
 ev3 = EV3Brick()
 stop_watch = StopWatch()
 
+#constants
+WHEEL_DIAMETER = 55.5
+AXLE_TRACK = 150
+
 # second initialization
 robot = DriveBase(
     left_motor, right_motor, wheel_diameter=WHEEL_DIAMETER, axle_track=AXLE_TRACK
@@ -25,7 +29,7 @@ robot = DriveBase(
 while True:
     robot.drive(100,0)
 
-    distance = distance()
+    distance = Usonic_sensor.distance()
     screen.print(distance, end='\n')
     if distance < 100:
         break
