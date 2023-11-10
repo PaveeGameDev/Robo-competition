@@ -280,34 +280,12 @@ print(
 
 
 def rotate(current, wanted):
-    if wanted == 0:
-        if current == 1:
-            return -90
-        elif current == 2:
-            return 180
-        elif current == 3:
-            return 90
-    elif wanted == 1:
-        if current == 0:
-            return 90
-        elif current == 2:
-            return -90
-        elif current == 3:
-            return 180
-    elif wanted == 2:
-        if current == 0:
-            return 180
-        elif current == 1:
-            return 90
-        elif current == 3:
-            return -90
-    elif wanted == 3:
-        if current == 0:
-            return -90
-        elif current == 1:
-            return 180
-        elif current == 2:
-            return 90
+    angle = (wanted - current) * 90
+    if angle > 180:
+        angle = 360 - angle
+    elif angle < -180:
+        angle = 360 + angle
+    return angle
 
 
 while True:
