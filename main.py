@@ -10,7 +10,7 @@ import math
 # Initialize everything
 left_motor = Motor(Port.B)
 right_motor = Motor(Port.A)
-grabber_motor = Motor(Port.C)
+#grabber_motor = Motor(Port.C)
 line_sensor = ColorSensor(Port.S1)
 gyro_sensor = GyroSensor(Port.S2)
 ev3 = EV3Brick()
@@ -65,7 +65,12 @@ def needToGoMiddle():
     # TODO: implement david
     dropOff()
 
-
+##Math functions
+def mod(a,b):
+    if a < 0 and b > 0 or a > 0 and b < 0:
+        return a % -b
+    else:
+        return a % b
 ##ROBO DPS (- Davis Positioning System)
 class DPS_class:
     def __init__(self, x, y):  # distance in mm, time in s, angle in degrees
@@ -81,12 +86,12 @@ class DPS_class:
         deltaT = time.time() - self.time
         self.time = time.time()
         robot.drive(speed, turning_rate)
+        print("time " + str(deltaT))
 
         beta = self.turning * deltaT
         difference = gyro_sensor.angle() - (self.angle + beta)
-        if abs(difference) >= 2:
-            print("fixing")
-            beta += difference
+        if (abs(difference) >= 2):
+            print('fixing ' + str(difference))
 
         if self.turning != 0:
             radius = (180 * self.speed) / (math.pi * self.turning)
@@ -102,6 +107,13 @@ class DPS_class:
 
         self.speed = speed
         self.turning = turning_rate
+    #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-
+    #--#-#-#-#-#-#-#-#-#-#-#-#-#-#
+    def pairAngle(self,a):
+        if a < 0:
+            return a + 360
+        else:
+            return a - 360
 
     def trajectory(self, x, y):
         deltaX = x - self.x
@@ -110,18 +122,31 @@ class DPS_class:
             if deltaY > 0:
                 alpha = 90
             else:
-                aplha = -90
+                alpha = -90
         else:
             m = deltaY / deltaX
             alpha = math.atan(m) / DEG_TO_RAD
+        if deltaX < 0:
+            alpha += 180
 
-        if alpha + 2 >= self.angle % 360 and alpha - 2 <= self.angle % 360:
-            self.calc(speed=200, turning_rate=0)
+        if alpha + 2 >= mod(self.angle, 360) and alpha - 2 <= mod(self.angle, 360):
+            print("    driving")
+            print(alpha,deltaX,deltaY)
+            print(self.angle,self.x,self.y)
+            self.calc(speed = 200, turning_rate = 0)
+        elif self.pairAngle(alpha + 2) >= mod(self.angle, 360) and self.pairAngle(alpha - 2) <= mod(self.angle, 360):
+            print("    driving2")
+            print(alpha,deltaX,deltaY)
+            print(self.angle,self.x,self.y)
+            self.calc(speed = 200, turning_rate = 0)
         else:
-            deltaAngle = alpha - (self.angle % 360)
-            self.calc(
-                speed=0, turning_rate=deltaAngle * 2
-            )  # ten nasobitel se bude menit - musi se najit nelepsi hodnota
+            deltaAngle = alpha - mod(self.angle, 360)
+            print("    turning")
+            print(alpha,deltaX,deltaY)
+            print(self.angle,self.x,self.y)
+            print(deltaAngle)
+            print(mod(self.angle, 360))
+            self.calc(speed = 0, turning_rate = deltaAngle * 2) #ten nasobitel se bude menit - musi se najit nelepsi hodnota
 
         if self.x + 5 > x and self.x - 5 < x and self.y + 5 > y and self.y - 5 < y:
             return True
@@ -134,7 +159,8 @@ DPS = DPS_class(0, 0)
 # rate = -22.5
 check = False
 print(DPS.x, DPS.y, DPS.zelta, DPS.angle)
-
+destination = [points[0][0],points[0][1]]
+i = 0
 while True:
     current_time = time.time()
     current_time_from_start = current_time - START_TIME
@@ -157,14 +183,18 @@ while True:
     turn_rate = deviation * abs(deviation) / TURN_RATE_DIVIDER * turn_rate_multiplier
 
     # Updates robot positioning system and tells robot to drive
-    # DPS.calc(DRIVE_SPEED, turn_rate)
-    back = DPS.trajectory(1000, 1000)
+    #DPS.calc(DRIVE_SPEED, turn_rate)
+    back = DPS.trajectory(destination[0],destination[1])
 
     if back:
-        robot.stop()
-        ev3.speaker.beep()
-        print(DPS.x, DPS.y, DPS.zelta, DPS.angle)
-        break
+        i += 1
+        if i < len(points):
+            destination = [points[i][0],points[i][1]]
+        else:
+            robot.stop()
+            ev3.speaker.beep()
+            print(DPS.x,DPS.y,DPS.zelta,DPS.angle)
+            break
 
     """ grabber_motor.run(GRAB_SPEED)
     
