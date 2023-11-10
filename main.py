@@ -159,7 +159,8 @@ DPS = DPS_class(0, 0)
 #rate = -22.5
 check = False
 print(DPS.x, DPS.y, DPS.zelta, DPS.angle)
-
+destination = [points[0][0],points[0][1]]
+i = 0
 while True:
     current_time = time.time()
     current_time_from_start = current_time - START_TIME
@@ -183,13 +184,17 @@ while True:
 
     # Updates robot positioning system and tells robot to drive
     #DPS.calc(DRIVE_SPEED, turn_rate)
-    back = DPS.trajectory(0, -1000)
+    back = DPS.trajectory(destination[0],destination[1])
 
     if back:
-        robot.stop()
-        ev3.speaker.beep()
-        print(DPS.x,DPS.y,DPS.zelta,DPS.angle)
-        break
+        i += 1
+        if i < len(points):
+            destination = [points[i][0],points[i][1]]
+        else:
+            robot.stop()
+            ev3.speaker.beep()
+            print(DPS.x,DPS.y,DPS.zelta,DPS.angle)
+            break
 
     """ grabber_motor.run(GRAB_SPEED)
     
