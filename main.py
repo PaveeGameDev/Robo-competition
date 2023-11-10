@@ -4,13 +4,14 @@ from pybricks.parameters import Port
 from pybricks.robotics import DriveBase
 from pybricks.hubs import EV3Brick
 from pybricks.tools import wait, StopWatch
+from points.py import points, ordered_points
 import time
 import math
 
 # Initialize everything
 left_motor = Motor(Port.B)
 right_motor = Motor(Port.A)
-#grabber_motor = Motor(Port.C)
+# grabber_motor = Motor(Port.C)
 line_sensor = ColorSensor(Port.S1)
 gyro_sensor = GyroSensor(Port.S2)
 ev3 = EV3Brick()
@@ -28,7 +29,7 @@ AXLE_TRACK = 150
 START_TIME = time.time()
 GRAB_SPEED = 500
 DROP_OFF_SPEED = 100
-TIME_TO_MIDDLE = 10 * 1000
+TIME_TO_MIDDLE = 80 * 1000
 TIME_TO_STOP = 83 * 1000
 DISTANCE_MULTIPLIER = 280
 
@@ -50,27 +51,36 @@ def getCover():
     global gettingCover
     gettingCover = True
     print("getting cover")
-    # TODO: implement david
+    while true:
+        left_motor.run(-DRIVE_SPEED)
+        right_motor.run(-DRIVE_SPEED)
 
 
 def dropOff():
     print("dropping off")
-    grabber_motor.run_time(DROP_OFF_SPEED, 10 * 1000, then=Stop.HOLD, wait=True)
+    grabber_motor.run_time(DROP_OFF_SPEED, 5 * 1000, then=Stop.HOLD, wait=True)
     getCover()
 
 
 def needToGoMiddle():
     global wentToMiddle
     wentToMiddle = True
-    # TODO: implement david
+    back = DPS.trajectory(points[ordered_points[-1]][0], points[ordered_points[-1]][1])
+    while not back:
+        back = DPS.trajectory(
+            points[ordered_points[-1]][0], points[ordered_points[-1]][1]
+        )
     dropOff()
 
+
 ##Math functions
-def mod(a,b):
+def mod(a, b):
     if a < 0 and b > 0 or a > 0 and b < 0:
         return a % -b
     else:
         return a % b
+
+
 ##ROBO DPS (- Davis Positioning System)
 class DPS_class:
     def __init__(self, x, y):  # distance in mm, time in s, angle in degrees
@@ -90,8 +100,8 @@ class DPS_class:
 
         beta = self.turning * deltaT
         difference = gyro_sensor.angle() - (self.angle + beta)
-        if (abs(difference) >= 2):
-            print('fixing ' + str(difference))
+        if abs(difference) >= 2:
+            print("fixing " + str(difference))
 
         if self.turning != 0:
             radius = (180 * self.speed) / (math.pi * self.turning)
@@ -107,9 +117,10 @@ class DPS_class:
 
         self.speed = speed
         self.turning = turning_rate
-    #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-
-    #--#-#-#-#-#-#-#-#-#-#-#-#-#-#
-    def pairAngle(self,a):
+
+    # -#-#-#-#-#-#-#-#-#-#-#-#-#-#-
+    # --#-#-#-#-#-#-#-#-#-#-#-#-#-#
+    def pairAngle(self, a):
         if a < 0:
             return a + 360
         else:
@@ -131,22 +142,26 @@ class DPS_class:
 
         if alpha + 2 >= mod(self.angle, 360) and alpha - 2 <= mod(self.angle, 360):
             print("    driving")
-            print(alpha,deltaX,deltaY)
-            print(self.angle,self.x,self.y)
-            self.calc(speed = 200, turning_rate = 0)
-        elif self.pairAngle(alpha + 2) >= mod(self.angle, 360) and self.pairAngle(alpha - 2) <= mod(self.angle, 360):
+            print(alpha, deltaX, deltaY)
+            print(self.angle, self.x, self.y)
+            self.calc(speed=200, turning_rate=0)
+        elif self.pairAngle(alpha + 2) >= mod(self.angle, 360) and self.pairAngle(
+            alpha - 2
+        ) <= mod(self.angle, 360):
             print("    driving2")
-            print(alpha,deltaX,deltaY)
-            print(self.angle,self.x,self.y)
-            self.calc(speed = 200, turning_rate = 0)
+            print(alpha, deltaX, deltaY)
+            print(self.angle, self.x, self.y)
+            self.calc(speed=200, turning_rate=0)
         else:
             deltaAngle = alpha - mod(self.angle, 360)
             print("    turning")
-            print(alpha,deltaX,deltaY)
-            print(self.angle,self.x,self.y)
+            print(alpha, deltaX, deltaY)
+            print(self.angle, self.x, self.y)
             print(deltaAngle)
             print(mod(self.angle, 360))
-            self.calc(speed = 0, turning_rate = deltaAngle * 2) #ten nasobitel se bude menit - musi se najit nelepsi hodnota
+            self.calc(
+                speed=0, turning_rate=deltaAngle * 2
+            )  # ten nasobitel se bude menit - musi se najit nelepsi hodnota
 
         if self.x + 5 > x and self.x - 5 < x and self.y + 5 > y and self.y - 5 < y:
             return True
@@ -156,26 +171,13 @@ class DPS_class:
 
 # Start following the line endlessly.
 DPS = DPS_class(0, 0)
-# rate = -22.5
 check = False
 print(DPS.x, DPS.y, DPS.zelta, DPS.angle)
-destination = [points[0][0],points[0][1]]
+destination = [points[ordered_points[0]][0], points[ordered_points[0]][1]]
 i = 0
 while True:
     current_time = time.time()
     current_time_from_start = current_time - START_TIME
-
-    """ if not check and gyro_sensor.angle() < -90:
-        check = True
-        rate = 0
-        Y = DPS.y
-        print(DPS.x, DPS.y, DPS.zelta, DPS.angle)
-
-    if check and Y * 2 > DPS.y:
-        robot.stop()
-        ev3.speaker.beep()
-        print(DPS.x,DPS.y,DPS.zelta,DPS.angle)
-        break """
 
     deviation = line_sensor.reflection() - threshold
 
@@ -183,24 +185,28 @@ while True:
     turn_rate = deviation * abs(deviation) / TURN_RATE_DIVIDER * turn_rate_multiplier
 
     # Updates robot positioning system and tells robot to drive
-    #DPS.calc(DRIVE_SPEED, turn_rate)
-    back = DPS.trajectory(destination[0],destination[1])
+
+    back = DPS.trajectory(destination[0], destination[1])
 
     if back:
         i += 1
+        if current_time_from_start > TIME_TO_MIDDLE and not wentToMiddle:
+            needToGoMiddle()
+
         if i < len(points):
-            destination = [points[i][0],points[i][1]]
+            destination = destination = [
+                points[ordered_points[i]][0],
+                points[ordered_points[i]][1],
+            ]
         else:
-            robot.stop()
-            ev3.speaker.beep()
-            print(DPS.x,DPS.y,DPS.zelta,DPS.angle)
-            break
+            dropOff()
+            # robot.stop()
+            # ev3.speaker.beep()
+            # print(DPS.x, DPS.y, DPS.zelta, DPS.angle)
+            # break
 
-    """ grabber_motor.run(GRAB_SPEED)
-    
-    if current_time_from_start > 10 and not wentToMiddle:
-        needToGoMiddle()
+    # grabber_motor.run(GRAB_SPEED)
 
-    if stop_watch.time > TIME_TO_STOP and gettingCover:
+    if current_time_from_start > TIME_TO_STOP and gettingCover:
         ev3.speaker.beep()
-        break """
+        break
