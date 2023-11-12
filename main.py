@@ -165,16 +165,16 @@ class DPS_class:
         if LostTheTarget and distance + 10 > self.average and distance - 10 < self.average: ##tesing if the lost object was found i.e. its cloase to the last avarage
             print("target found")
             print(self.x, self.y, self.angle)
-            print(destination[0], destination[1])
-            LostTheTarget = False
-            newX = math.cos(self.angle * DEG_TO_RAD) * distance ## now i know more precisely the angle where the object is, so i can calculate new position 
-            newY = math.sin(self.angle * DEG_TO_RAD) * distance 
+            if RightSide:
+                newX = math.cos((self.angle - 1) * DEG_TO_RAD) * distance ## now i know more precisely the angle where the object is, so i can calculate new position 
+                newY = math.sin((self.angle - 1) * DEG_TO_RAD) * distance 
+            else:
+                newX = math.cos((self.angle + 1) * DEG_TO_RAD) * distance ## now i know more precisely the angle where the object is, so i can calculate new position 
+                newY = math.sin((self.angle + 1) * DEG_TO_RAD) * distance 
             points[i][0] = newX + self.x
             points[i][1] = newY + self.y
             destination[0] = newX + self.x
             destination[1] = newY + self.y
-            print(newX, newY)
-            print(destination[0], destination[1])
 
         if self.angle >= self.lostAngle  + USangle and LostTheTarget: ##testing if the robot turned the wanted amount of degrees to side, so it can start turning to the second one
             if not RightSide:
