@@ -1,9 +1,9 @@
 self.distance = [] #
 self.lostAngle = 0
 LostTheTarget = False
-USangle = 5
 RightSide = False
 sensorDelta = [x,y]
+USangle = 5
 
 
 distance = Usensor.distance()
@@ -15,11 +15,14 @@ if not LostTheTarget: ##if the robot hadn't lost the cube, save the distance fro
 
 z = math.sqrt((deltaX - sensorDelta[0])**2 + (deltaY - sensorDelta[1])**2)
 
-if z < 500 and not LostTheTarget and distance + 5 < average or distance - 5 > average: ##testing if sensor lost the object i.e. its really far from average
+if z < 500 and not LostTheTarget and distance + 5 < average or distance - 5 > average and alpha + 2 >= mod(self.angle, 360) and alpha - 2 <= mod(self.angle, 360): ##testing if sensor lost the object i.e. its really far from average
     print("lost the target")
     LostTheTarget = True
     self.lostAngle = Self.Angle
-
+elif z < 500 and not LostTheTarget and distance + 5 < average or distance - 5 > average and self.pairAngle(alpha + 2) >= mod(self.angle, 360) and self.pairAngle(alpha - 2) <= mod(self.angle, 360):
+    print("lost the target")
+    LostTheTarget = True
+    self.lostAngle = Self.Angle
 if LostTheTarget and distance + 10 > average and distance - 10 < average: ##tesing if the lost object was found i.e. its cloase to the last avarage
     LostTheTarget = False
     newX = math.sin(self.angle * DEG_TO_RAD) * distance ## now i know more precisely the angle where the object is, so i can calculate new position 
