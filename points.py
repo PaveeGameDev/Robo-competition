@@ -57,3 +57,5 @@ points = [
 
 # jak se ma jezdit po bodech
 ordered_points = [40, 30, 24, 5, 11, 16, 41, 25, 4, 3, 21, 42, 20, 15, 2, 26, 43, 23]
+
+
