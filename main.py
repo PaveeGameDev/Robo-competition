@@ -170,7 +170,7 @@ class DPS_class:
 
 
 # Start following the line endlessly.
-DPS = DPS_class(1960, 560)
+DPS = DPS_class(1960, 1120)
 check = False
 print(DPS.x, DPS.y, DPS.zelta, DPS.angle)
 destination = [points[ordered_points[0]][0], points[ordered_points[0]][1]]
