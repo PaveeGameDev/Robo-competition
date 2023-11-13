@@ -145,11 +145,11 @@ class DPS_class:
         distance = USsensor.distance()
         z = math.sqrt((deltaX - sensorDelta[0])**2 + (deltaY - sensorDelta[1])**2)
 
-        if z < 500 and not LostTheTarget and (distance + 5 < self.average or distance - 5 > self.average) and alpha + 2 >= mod(self.angle, 360) and alpha - 2 <= mod(self.angle, 360): ##testing if sensor lost the object i.e. its really far from average
+        if z < 200 and not LostTheTarget and (distance + 5 < self.average or distance - 5 > self.average) and alpha + 2 >= mod(self.angle, 360) and alpha - 2 <= mod(self.angle, 360): ##testing if sensor lost the object i.e. its really far from average
             print("lost the target")
             LostTheTarget = True
             self.lostAngle = self.angle
-        elif z < 500 and not LostTheTarget and (distance + 5 < self.average or distance - 5 > self.average) and self.pairAngle(alpha + 2) >= mod(self.angle, 360) and self.pairAngle(alpha - 2) <= mod(self.angle, 360):
+        elif z < 200 and not LostTheTarget and (distance + 5 < self.average or distance - 5 > self.average) and self.pairAngle(alpha + 2) >= mod(self.angle, 360) and self.pairAngle(alpha - 2) <= mod(self.angle, 360):
             print("lost the target")
             LostTheTarget = True
             self.lostAngle = self.angle
@@ -159,10 +159,19 @@ class DPS_class:
             if len(self.distance) > 5:
                 self.distance.pop()
             self.average = sum(self.distance) / len(self.distance)
+            
+        if (self.average > z + 100 or self.average < z - 100) and z < 200 and len(self.distance) == 5:
+            print("new func")
+            self.distance = list(map(lambda x: z, self.distance))
+            LostTheTarget == True
+            self.average = sum(self.distance) / len(self.distance)
+            print(self.average)
+            print(z)
+            print("konec new func")
 
         print(self.average)
         print(distance)
-        if LostTheTarget and distance + 10 > self.average and distance - 10 < self.average: ##tesing if the lost object was found i.e. its cloase to the last avarage
+        if LostTheTarget and distance + 100 > self.average and distance - 100 < self.average: ##tesing if the lost object was found i.e. its cloase to the last avarage
             print("target found")
             print(self.x, self.y, self.angle)
             if RightSide:
@@ -175,6 +184,7 @@ class DPS_class:
             points[i][1] = newY + self.y
             destination[0] = newX + self.x
             destination[1] = newY + self.y
+            LostTheTarget = False
 
         if self.angle >= self.lostAngle  + USangle and LostTheTarget: ##testing if the robot turned the wanted amount of degrees to side, so it can start turning to the second one
             if not RightSide:
@@ -188,9 +198,9 @@ class DPS_class:
         if LostTheTarget: ##the moving part of finding lost object
             print("turning and looking for object")
             if RightSide:
-                deltaAngle = -10
+                deltaAngle = -10 /2
             else:
-                deltaAngle = 10
+                deltaAngle = 10 /2
             self.calc(speed = 0, turning_rate = deltaAngle * 2)
             #--#--#--#--#--#--#--#--#--#--#--#--#--#--#--#--#--#--#--#--#--#--#--#--#
             #--#--#--#--#--#--#--#--#--#--#--#--#--#--#--#--#--#--#--#--#--#--#--#--#
@@ -221,7 +231,7 @@ class DPS_class:
 # Start following the line endlessly.
 DPS = DPS_class(0, 0)
 print(DPS.x, DPS.y, DPS.zelta, DPS.angle)
-destination = [1100,0]
+destination = [950,0]
 i = 0
 
 check = False
