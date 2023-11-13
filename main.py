@@ -4,7 +4,7 @@ from pybricks.parameters import Port
 from pybricks.robotics import DriveBase
 from pybricks.hubs import EV3Brick
 from pybricks.tools import wait, StopWatch
-from points.py import points, ordered_points
+from points import points, ordered_points
 import time
 import math
 
@@ -87,8 +87,8 @@ class DPS_class:
         self.time = time.time()
         self.angle = 0
         self.zelta = -90
-        self.x = 0
-        self.y = 0
+        self.x = x
+        self.y = y
         self.speed = 0
         self.turning = 0
 
@@ -170,7 +170,7 @@ class DPS_class:
 
 
 # Start following the line endlessly.
-DPS = DPS_class(0, 0)
+DPS = DPS_class(1960, 560)
 check = False
 print(DPS.x, DPS.y, DPS.zelta, DPS.angle)
 destination = [points[ordered_points[0]][0], points[ordered_points[0]][1]]
