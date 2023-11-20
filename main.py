@@ -8,9 +8,9 @@ import time
 import math
 
 # Initialize everything
-right_motor = Motor(Port.A)
-left_motor = Motor(Port.B)
-grabber_motor = Motor(Port.C)
+right_motor = Motor(Port.B)
+left_motor = Motor(Port.C)
+grabber_motor = Motor(Port.D)
 # touchSensor = TouchSensor(Port.S4)
 # line_sensor = ColorSensor(Port.S1)
 gyro_sensor = GyroSensor(Port.S1)
@@ -34,9 +34,9 @@ DISTANCE_MULTIPLIER = 280
 
 
 # second initialization
-robot = DriveBase(
-    left_motor, right_motor, wheel_diameter=WHEEL_DIAMETER, axle_track=AXLE_TRACK
-)
+# robot = DriveBase(
+#     left_motor, right_motor, wheel_diameter=WHEEL_DIAMETER, axle_track=AXLE_TRACK
+# )
 
 
 current_time_from_start = time.time()
@@ -56,6 +56,7 @@ RELEASE_WHEELS_SPEED = 100
 TIME_TO_GET_COVER = 5
 
 # Going variables
+gyroAngle = 0
 gyroOffset = 0
 
 def getCover():
@@ -89,27 +90,33 @@ def go(distance):
 
 
 def turn(angle):
+    global gyroAngle
     global gyroOffset
-    currentGyroValue = gyro_sensor.angle()
     print("turning", angle)
     robot.turn(angle)
-    gyroError = currentGyroValue - gyro_sensor.angle() + angle + gyroOffset
-    print("gyro error", gyroError)
-    gyroOffset = gyroError
+    currentgyroError = gyro_sensor.angle() - (angle + gyroAngle)
+    print("gyro error", currentgyroError)
+    print("gyro offset", gyroOffset)
+    gyroAngle = gyro_sensor.angle()
+    gyroOffset += currentgyroError
     
 # grabber_motor.run(-GRAB_SPEED)
 grabber_motor.dc(-100)
-go(3.5)
-turn(90)
-go(7)
-turn(90)
-go(5)
-turn(90)
-go(7)
-turn(90)
-go(2.5)
-turn(90)
-go(3.5)
-turn(90)
-wait(10)
+left_motor.dc(-100)
+right_motor.dc(-100)
+wait(20000)
+# go(10)
+# go(3.5)
+# turn(90)
+# go(7)
+# turn(90)
+# go(5)
+# turn(90)
+# go(7)
+# turn(90)
+# go(2.5)
+# turn(90)
+# go(3.5)
+# turn(90)
+# wait(10)
 dropOff()
