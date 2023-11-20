@@ -9,8 +9,8 @@ import time
 import math
 
 # Initialize everything
-left_motor = Motor(Port.B)
 right_motor = Motor(Port.A)
+left_motor = Motor(Port.B)
 grabber_motor = Motor(Port.C)
 # line_sensor = ColorSensor(Port.S1)
 # gyro_sensor = GyroSensor(Port.S2)
@@ -71,8 +71,15 @@ def stop():
     grabber_motor.stop()
     ev3.speaker.beep()
     
-
-while True:
-    if time.time() > current_time_from_start + TIME_TO_STOP:
-        ev3.speaker.beep()
-        break
+# go(3.5)
+# turn(-90)
+# go(7)
+# turn(-90)
+# go(5)
+# turn(-90)
+# go(7)
+# turn(-90)
+# go(2.5)
+# turn(-90)
+# go(3.5)
+dropOff()
