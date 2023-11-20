@@ -1,10 +1,10 @@
 #!/usr/bin/env pybricks-micropython
-from importing import robot, gyro_sensor, USsensor, ev3, stop_watch, #grabber_motor, line_sensor
+from importing import robot, gyro_sensor, USsensor, ev3, stop_watch, wait, #grabber_motor, line_sensor
 from DPS import DPS_class
 import time
 import math
 
-WHEEL_DIAMETER = 40
+WHEEL_DIAMETER = 55
 AXLE_TRACK = 200
 START_TIME = time.time()
 GRAB_SPEED = 10000
@@ -57,14 +57,14 @@ def stop():
     grabber_motor.stop()
     ev3.speaker.beep()
 
-def go(distance):
+def go(distance, currentGyro):
     robot.reset()
+    gyro_sensor.reset_angle(currentGyro)
     while robot.distance() < distance * DISTANCE_MULTIPLIER:
-        robot.drive(DRIVE_SPEED, (USsensor.distance() - 140) * 20)
+        robot.drive(100, -gyro_sensor.angle())
         print("distance", robot.distance())
-        print("gyro", gyrogyro_sensor.angle())
-        print("US", USsensor.distance() - 140)
-        wait(100)
+        print("gyro", gyro_sensor.angle())
+        wait(50)
     
     print("going straight for", distance * DISTANCE_MULTIPLIER)
 
@@ -80,8 +80,8 @@ def turn(angle):
     gyroAngle = gyrogyro_sensor.angle()
     gyroOffset += currentgyroError
 
-# grabber_motor.dc(-100)
-go(10)
+grabber_motor.dc(-100)
+go(1, 10)
 # go(3.5)
 # turn(90)
 # go(7)
