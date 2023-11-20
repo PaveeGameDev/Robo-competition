@@ -10,7 +10,7 @@ from points import points, ordered_points
 left_motor = Motor(Port.B)
 right_motor = Motor(Port.A)
 # grabber_motor = Motor(Port.C)
-line_sensor = ColorSensor(Port.S1)
+#line_sensor = ColorSensor(Port.S1)
 gyro_sensor = GyroSensor(Port.S2)
 USsensor = UltrasonicSensor(Port.S3)
 ev3 = EV3Brick()
