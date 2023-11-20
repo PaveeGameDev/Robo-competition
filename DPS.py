@@ -124,12 +124,14 @@ class DPS_class:
             
             print(real_distance)
             
-            if real_distance + 15 >= distance and not left:
+            if real_distance - 15 >= distance and not left:
                 right = False
+                left = True
                 print("1 turn")
                 self.calc(speed = 100, turning_rate = -100*side)
-            elif real_distance - 15 <= distance and not right:
+            elif real_distance + 15 <= distance and not right:
                 left = False
+                right = True
                 print("else")
                 self.calc(speed = 100, turning_rate = 100*side)
             else:
