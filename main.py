@@ -33,6 +33,7 @@ gettingCover = False
 gyroAngle = 0
 gyroOffset = 0
 
+
 def getCover():
     robot.drive(DRIVE_SPEED / 3, 0)
     wait(500)
@@ -56,15 +57,42 @@ def stop():
     grabber_motor.stop()
     ev3.speaker.beep()
 
-DPS = DPS_class(x = START_POINT[0], y = START_POINT[1], angle = START_POINT[0])
-# grabber_motor.run(-GRAB_SPEED)
+def go(distance):
+    robot.reset()
+    while robot.distance() < distance * DISTANCE_MULTIPLIER:
+        robot.drive(DRIVE_SPEED, (USsensor.distance() - 140) * 20)
+        print("distance", robot.distance())
+        print("gyro", gyrogyro_sensor.angle())
+        print("US", USsensor.distance() - 140)
+        wait(100)
+    
+    print("going straight for", distance * DISTANCE_MULTIPLIER)
+
+
+def turn(angle):
+    global gyroAngle
+    global gyroOffset
+    print("turning", angle)
+    robot.turn(angle)
+    currentgyroError = gyrogyro_sensor.angle() - angle - gyroAngle
+    print("gyro error", currentgyroError)
+    print("gyro offset", gyroOffset)
+    gyroAngle = gyrogyro_sensor.angle()
+    gyroOffset += currentgyroError
+
 # grabber_motor.dc(-100)
-DPS.go_by_wall([5.5 * 280, 0], 140, SIDE_OF_US, US_OFFSET)
-""" 
-DPS.turn(90)
-DPS.go_by_wall([0, 5 * 280], 280, SIDE_OF_US, US_OFFSET)
-DPS.turn(90)
-DPS.go_by_wall([7 * 280, 0], 140, SIDE_OF_US, US_OFFSET)
-DPS.turn(90)
-DPS.go_by_wall([0, 5 * 280], 280, SIDE_OF_US, US_OFFSET)
-DPS.turn(90) """
+go(10)
+# go(3.5)
+# turn(90)
+# go(7)
+# turn(90)
+# go(5)
+# turn(90)
+# go(7)
+# turn(90)
+# go(2.5)
+# turn(90)
+# go(3.5)
+# turn(90)
+# wait(10)
+dropOff()
