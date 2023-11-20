@@ -11,7 +11,7 @@ import math
 # Initialize everything
 left_motor = Motor(Port.B)
 right_motor = Motor(Port.A)
-# grabber_motor = Motor(Port.C)
+grabber_motor = Motor(Port.C)
 # line_sensor = ColorSensor(Port.S1)
 # gyro_sensor = GyroSensor(Port.S2)
 ev3 = EV3Brick()
@@ -46,19 +46,31 @@ wentToMiddle = False
 gettingCover = False
 
 
-
-
 # Release variables
 TIME_TO_GO_BACK = 5
+CUKNOUT_SPEED = 20
 RELEASE_WHEELS_WAIT_TIME = 1
 RELEASE_WHEELS_SPEED = 100
 
+# Get cover variables
+TIME_TO_GET_COVER = 5
+
+
 def getCover():
+    robot.drive_time(-DRIVE_SPEED, TIME_TO_GET_COVER * 1000)
+    stop()
     
-
-
 def dropOff():
+    grabber_motor.run_time(CUKNOUT_SPEED, 0.2 * 1000)
     robot.drive_time(-DRIVE_SPEED, TIME_TO_GO_BACK * 1000)
+    grabber_motor.run_time(RELEASE_WHEELS_SPEED, RELEASE_WHEELS_WAIT_TIME * 1000)
+    getCover()
+    
+def stop():
+    robot.stop()
+    grabber_motor.stop()
+    ev3.speaker.beep()
+    
 
 while True:
     if time.time() > current_time_from_start + TIME_TO_STOP:
