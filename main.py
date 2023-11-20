@@ -56,6 +56,7 @@ RELEASE_WHEELS_SPEED = 100
 TIME_TO_GET_COVER = 5
 
 # Going variables
+gyroAngle = 0
 gyroOffset = 0
 
 def getCover():
@@ -89,13 +90,15 @@ def go(distance):
 
 
 def turn(angle):
+    global gyroAngle
     global gyroOffset
-    currentGyroValue = gyro_sensor.angle()
     print("turning", angle)
     robot.turn(angle)
-    gyroError = currentGyroValue - gyro_sensor.angle() + angle + gyroOffset
-    print("gyro error", gyroError)
-    gyroOffset = gyroError
+    currentgyroError = gyrogyro_sensor.angle() - angle - gyroAngle
+    print("gyro error", currentgyroError)
+    print("gyro offset", gyroOffset)
+    gyroAngle = gyrogyro_sensor.angle()
+    gyroOffset += currentgyroError
     
 # grabber_motor.run(-GRAB_SPEED)
 grabber_motor.dc(-100)
