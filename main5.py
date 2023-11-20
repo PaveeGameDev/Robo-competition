@@ -24,7 +24,7 @@ ev3 = EV3Brick()
 DRIVE_SPEED = 200
 # TURN_RATE_DIVIDER = 3
 WHEEL_DIAMETER = 40
-AXLE_TRACK = 200
+AXLE_TRACK = 150
 START_TIME = time.time()
 GRAB_SPEED = 10000
 DROP_OFF_SPEED = 100
@@ -84,7 +84,6 @@ def stop():
     
 def go(distance):
     robot.straight(-distance * DISTANCE_MULTIPLIER)
-    
     print("going straight for", distance * DISTANCE_MULTIPLIER)
 
 
@@ -100,16 +99,16 @@ def turn(angle):
 # grabber_motor.run(-GRAB_SPEED)
 grabber_motor.dc(-100)
 go(3.5)
-turn(90)
+turn(-90)
 go(7)
-turn(90)
+turn(-90)
 go(5)
-turn(90)
+turn(-90)
 go(7)
-turn(90)
+turn(-90)
 go(2.5)
-turn(90)
+turn(-90)
 go(3.5)
-turn(90)
+turn(-90)
 wait(10)
 dropOff()
