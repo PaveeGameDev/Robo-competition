@@ -1,28 +1,9 @@
 #!/usr/bin/env pybricks-micropython
-from pybricks.ev3devices import Motor, ColorSensor, GyroSensor, TouchSensor
-from pybricks.parameters import Port, Stop
-from pybricks.robotics import DriveBase
-from pybricks.hubs import EV3Brick
-from pybricks.tools import wait, StopWatch
+from importing import robot, gyro_sensor, USsensor, ev3, stop_watch, #grabber_motor, line_sensor
+from DPS import DPS_class
 import time
 import math
 
-# Initialize everything
-right_motor = Motor(Port.A)
-left_motor = Motor(Port.B)
-grabber_motor = Motor(Port.C)
-# touchSensor = TouchSensor(Port.S4)
-# line_sensor = ColorSensor(Port.S1)
-gyro_sensor = GyroSensor(Port.S1)
-ev3 = EV3Brick()
-# stop_watch = StopWatch()
-
-# constants
-# BLACK = 15
-# WHITE = 40
-# threshold = (BLACK + WHITE) / 2
-DRIVE_SPEED = 200
-# TURN_RATE_DIVIDER = 3
 WHEEL_DIAMETER = 40
 AXLE_TRACK = 200
 START_TIME = time.time()
@@ -31,22 +12,10 @@ DROP_OFF_SPEED = 100
 TIME_TO_MIDDLE = 80 
 TIME_TO_STOP = 83 
 DISTANCE_MULTIPLIER = 280
-
-
-# second initialization
-robot = DriveBase(
-    left_motor, right_motor, wheel_diameter=WHEEL_DIAMETER, axle_track=AXLE_TRACK
-)
-
-
-current_time_from_start = time.time()
-gyro_angle = 0
-turn_rate_multiplier = 1
-wentToMiddle = False
-gettingCover = False
-
-
-# Release variables
+START_POINT = [0,0,0] ##TODO get the position
+SIDE_OF_US = -1
+US_OFFSET = [-85,40] ##TODO get the numbers
+#-#-# Release variables
 TIME_TO_GO_BACK = 5
 CUKNOUT_SPEED = 20
 RELEASE_WHEELS_WAIT_TIME = 0.5
@@ -54,6 +23,11 @@ RELEASE_WHEELS_SPEED = 100
 
 # Get cover variables
 TIME_TO_GET_COVER = 5
+current_time_from_start = time.time()
+gyro_angle = 0
+turn_rate_multiplier = 1
+wentToMiddle = False
+gettingCover = False
 
 # Going variables
 gyroAngle = 0
@@ -81,38 +55,16 @@ def stop():
     robot.stop()
     grabber_motor.stop()
     ev3.speaker.beep()
-    
-    
-def go(distance):
-    robot.straight(-distance * DISTANCE_MULTIPLIER)
-    
-    print("going straight for", distance * DISTANCE_MULTIPLIER)
 
-
-def turn(angle):
-    global gyroAngle
-    global gyroOffset
-    print("turning", angle)
-    robot.turn(angle)
-    currentgyroError = gyrogyro_sensor.angle() - angle - gyroAngle
-    print("gyro error", currentgyroError)
-    print("gyro offset", gyroOffset)
-    gyroAngle = gyrogyro_sensor.angle()
-    gyroOffset += currentgyroError
-    
+DPS = DPS_class(x = START_POINT[0], y = START_POINT[1], angle = START_POINT[0])
 # grabber_motor.run(-GRAB_SPEED)
-grabber_motor.dc(-100)
-go(3.5)
-turn(90)
-go(7)
-turn(90)
-go(5)
-turn(90)
-go(7)
-turn(90)
-go(2.5)
-turn(90)
-go(3.5)
-turn(90)
-wait(10)
-dropOff()
+# grabber_motor.dc(-100)
+DPS.go_by_wall([5.5 * 280, 0], 140, SIDE_OF_US, US_OFFSET)
+""" 
+DPS.turn(90)
+DPS.go_by_wall([0, 5 * 280], 280, SIDE_OF_US, US_OFFSET)
+DPS.turn(90)
+DPS.go_by_wall([7 * 280, 0], 140, SIDE_OF_US, US_OFFSET)
+DPS.turn(90)
+DPS.go_by_wall([0, 5 * 280], 280, SIDE_OF_US, US_OFFSET)
+DPS.turn(90) """

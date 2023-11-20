@@ -1,5 +1,5 @@
 #!/usr/bin/env pybricks-micropython
-from importing import robot,line_sensor,gyro_sensor,USsensor,ev3,stop_watch, #grabber_motor
+from importing import robot, gyro_sensor, USsensor, ev3, stop_watch, #grabber_motor, line_sensor
 import time
 import math
 
@@ -103,11 +103,54 @@ class DPS_class:
             return False
     
 
-    def turn(angle):
-        beggining_agle = self.angle
+    def turn(self, angle):
+        beggining_angle = self.angle
         while True:
             deltaAngle = mod(self.angle, 360) - angle
             self.calc(speed = 0, turning_rate = deltaAngle)
 
             if self.angle + 2 >= beggining_angle + angle and self.angle - 2 <= beggining_angle + angle:
                 break
+        
+    def go_by_wall(self, path, distance, side, offset): ##side (1 or -1) is the side where ultrasonic sensor is (negatve = left, positive = right)
+        beggining = [self.x, self.y]                 ##offset negative is for left side positive for right side
+        end = [self.x + path[0], self.y + path[1]]
+        right = False
+        left = False
+
+        while True:
+            print("wall loop")
+            real_distance = USsensor.distance() + offset[0]*side
+            
+            print(real_distance)
+            
+            if real_distance + 15 >= distance and not left:
+                right = False
+                print("1 turn")
+                self.calc(speed = 100, turning_rate = -100*side)
+            elif real_distance - 15 <= distance and not right:
+                left = False
+                print("else")
+                self.calc(speed = 100, turning_rate = 100*side)
+            else:
+                print("strait")
+                self.calc(speed = 100, turning_rate = 0)
+
+            if path[1] == 0:
+                if path[0] > 0:
+                    if self.x >= end[0]:
+                        print('1')
+                        return True
+                elif path[0] < 0:
+                    if self.x <= end[0]:
+                        print('2')
+                        return True
+            elif path[0] == 0:
+                if path[1] > 0:
+                    if self.y >= end[1]:
+                        print('3')
+                        return True
+                elif path[1] < 0:
+                    if self.y <= end[1]:
+                        print('4')
+                        return True
