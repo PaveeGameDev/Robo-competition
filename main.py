@@ -35,7 +35,7 @@ DRIVE_SPEED = 100
 #-#-# Release variables
 TIME_TO_GO_BACK = 5
 CUKNOUT_SPEED = 20
-RELEASE_WHEELS_WAIT_TIME = 1.5
+RELEASE_WHEELS_WAIT_TIME = 2
 RELEASE_WHEELS_SPEED = 100
 
 # Get cover variables
@@ -74,29 +74,22 @@ def getCover():
 def dropOff():
     print("drop off")
     grabber_motor.dc(100)
-    wait(400)
+    wait(300)
     grabber_motor.dc(-100)
-    wait(200)
+    wait(300)
     grabber_motor.dc(100)
-    wait(400)
-    grabber_motor.dc(-100)
-    wait(200)
-    grabber_motor.dc(100)
-    wait(400)
-    grabber_motor.dc(-100)
-    wait(200)
-    grabber_motor.dc(100)
-    wait(400)
+    wait(300)
     grabber_motor.dc(-100)
     wait(2000)
     grabber_motor.dc(0)
+    grabber_motor.run_time(-10000, 0.5 * 1000, then=Stop.HOLD, wait=False)
     while not touchSensor.pressed():
         robot.drive(DRIVE_SPEED / 3, 0)
     robot.drive(DRIVE_SPEED / 3, 0)
+    wait(2500)
+    robot.drive(-DRIVE_SPEED / 3, 0)
     wait(1000)
-    grabber_motor.run_time(1000, RELEASE_WHEELS_WAIT_TIME * 1000, then=Stop.HOLD, wait=False)
-    # robot.drive(DRIVE_SPEED / 3, 0)
-    # wait(500)
+    grabber_motor.run_time(1000, RELEASE_WHEELS_WAIT_TIME * 1000, then=Stop.HOLD, wait=True)
     print("drop off done")
     getCover()
     
