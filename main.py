@@ -35,7 +35,7 @@ DRIVE_SPEED = 100
 #-#-# Release variables
 TIME_TO_GO_BACK = 5
 CUKNOUT_SPEED = 20
-RELEASE_WHEELS_WAIT_TIME = 2
+RELEASE_WHEELS_WAIT_TIME = 4
 RELEASE_WHEELS_SPEED = 100
 
 # Get cover variables
@@ -57,6 +57,8 @@ def turnA():
         if gyro_sensor.angle() <= -90 - beggining_angle:
             robot.stop()
             return gyro_sensor.angle() - (-90 - beggining_angle)
+
+    return 0
         
 def turnB():
     robot.drive(-1.5*math.pi*140,90)
@@ -68,7 +70,7 @@ def turnB():
 
 def getCover():
     robot.drive(DRIVE_SPEED / 3, 0)
-    wait(1000)
+    wait(2000)
     stop()
     
 def dropOff():
@@ -89,7 +91,9 @@ def dropOff():
     wait(2500)
     robot.drive(-DRIVE_SPEED / 3, 0)
     wait(1000)
-    grabber_motor.run_time(1000, RELEASE_WHEELS_WAIT_TIME * 1000, then=Stop.HOLD, wait=True)
+    grabber_motor.dc(100)
+    wait(2200)
+    # grabber_motor.run_time(10000, RELEASE_WHEELS_WAIT_TIME * 1000, then=Stop.HOLD, wait=True)
     print("drop off done")
     getCover()
     
@@ -103,7 +107,7 @@ def go(distance, currentGyro):
     robot.reset()
     gyro_sensor.reset_angle(currentGyro)
     while abs(robot.distance()) < abs(distance * DISTANCE_MULTIPLIER):
-        robot.drive(-200 * abs(distance)/distance, -gyro_sensor.angle())
+        robot.drive(-100 * abs(distance)/distance, gyro_sensor.angle())
         print("distance", robot.distance())
         print("gyro", gyro_sensor.angle())
         wait(50)
@@ -121,16 +125,53 @@ def go(distance, currentGyro):
 #         print("gyro", gyro_sensor.angle())
 #         wait(50)
     
+def folow_wall(target):
+    distance = USsensor.distance()
+    
+    if distance - 20 > target:
+        robot.turn(10)
+        robot.drive(-100, 0)
+    elif distance + 20 < target:
+        robot.turn(-10)
+        robot.drive(-100,0)
+    else:
+        robot.drive(-100,0)
+
+def turn(angle):
+    global gyroAngle
+    global gyroOffset
+    print("turning", angle)
+    robot.turn(angle)
+    currentgyroError = gyro_sensor.angle() - angle - gyroAngle
+    print("gyro error", currentgyroError % 90 - 90)
+    print("gyro offset", gyroOffset)
+    gyroAngle = gyro_sensor.angle()
+    gyroOffset += currentgyroError
+    return currentgyroError % 90 - 90
+
 grabber_motor.dc(-100)
-wait(500)
-# go(3.5, 0)
-# firstOffset = turnA()
-# go(5, firstOffset)
-# secondOffset = turnB()
-# go(3, thirdOffset)
-# thirdOffset = turnA()
-# go(6, thirdOffset)
-# go(-3.5, 0)
-# fourthOffset = turnB()
-# go(0.5, 0)
+wait(1000)
+go(3.5, 0)
+firstOffset = turn(45)
+go(0.7,0)
+secondError = turn(abs(45 + firstOffset))
+go(4.5, 0)
+firstOffset = turn(22)
+go(2.061,0)
+secondError = turn(abs(78 + firstOffset))
+go(3, 0)
+firstOffset = turn(45)
+go(0.7,0)
+secondError = turn(abs(45 + firstOffset))
+go(4.5, 0)
+firstOffset = turn(22)
+go(2.061,0)
+secondError = turn(abs(78 + firstOffset))
+firstOffset = turn(45)
+go(0.7,0)
+secondError = turn(abs(45 + firstOffset))
+go(1.5,0)
+firstOffset = turn(45)
+go(0.7,0)
+secondError = turn(abs(45 + firstOffset))
 dropOff()
