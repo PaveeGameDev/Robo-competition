@@ -138,40 +138,37 @@ def folow_wall(target):
         robot.drive(-100,0)
 
 def turn(angle):
-    global gyroAngle
-    global gyroOffset
     print("turning", angle)
+    gyro_sensor.reset_angle(0)
     robot.turn(angle)
-    currentgyroError = gyro_sensor.angle() - angle - gyroAngle
-    print("gyro error", currentgyroError % 90 - 90)
-    print("gyro offset", gyroOffset)
-    gyroAngle = gyro_sensor.angle()
-    gyroOffset += currentgyroError
-    return currentgyroError % 90 - 90
+    currentgyroError = gyro_sensor.angle() - angle
+    print("gyro error", currentgyroError % 90)
+    return currentgyroError % 90
 
 grabber_motor.dc(-100)
 wait(1000)
 go(3.5, 0)
 firstOffset = turn(45)
 go(0.7,0)
-secondError = turn(abs(45 + firstOffset))
+secondError = turn(abs(45 - firstOffset))
 go(4.5, 0)
 firstOffset = turn(22)
 go(2.061,0)
-secondError = turn(abs(78 + firstOffset))
+secondError = turn(abs(78 - firstOffset))
 go(3, 0)
 firstOffset = turn(45)
 go(0.7,0)
-secondError = turn(abs(45 + firstOffset))
+secondError = turn(abs(45 - firstOffset))
 go(4.5, 0)
 firstOffset = turn(22)
 go(2.061,0)
-secondError = turn(abs(78 + firstOffset))
+secondError = turn(abs(78 - firstOffset))
+
 firstOffset = turn(45)
 go(0.7,0)
-secondError = turn(abs(45 + firstOffset))
+secondError = turn(abs(45 - firstOffset))
 go(1.5,0)
 firstOffset = turn(45)
 go(0.7,0)
-secondError = turn(abs(45 + firstOffset))
+secondError = turn(abs(45 - firstOffset))
 dropOff()
