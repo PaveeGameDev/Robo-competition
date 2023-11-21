@@ -1,22 +1,8 @@
 #!/usr/bin/env pybricks-micropython
-from importing import robot,  ev3, stop_watch,gyro_sensor #grabber_motor, line_sensor , USsensor,
+from importing import robot,  ev3, stop_watch,gyro_sensor, grabber_motor, touchSensor, wait, Stop
 #from DPS import DPS_class
 import time
 import math
-
-def a_turn():
-    robot.drive(-0.5*math.pi*140,90)
-    while True:
-        if gyro_sensor.angle() <= -90:
-            robot.stop()
-            return gyro_sensor.angle() % -90
-        
-def b_turn():
-    robot.drive(-1.5*math.pi*140,-90)
-    while True:
-        if gyro_sensor.angle()  <= -90:
-            robot.stop()
-            return gyro_sensor.angle() % -90
 
 WHEEL_DIAMETER = 40
 AXLE_TRACK = 200
@@ -28,6 +14,7 @@ TIME_TO_STOP = 83
 DISTANCE_MULTIPLIER = 280
 SIDE_OF_US = -1
 US_OFFSET = [-85,40] 
+DRIVE_SPEED = 100
 
 #-#-# Release variables
 TIME_TO_GO_BACK = 5
@@ -47,6 +34,21 @@ gettingCover = False
 gyroAngle = 0
 gyroOffset = 0
 
+def turnA():
+    robot.drive(-0.5*math.pi*140,90)
+    beggining_angle = gyro_sensor.angle()
+    while True:
+        if gyro_sensor.angle() <= -90 - beggining_angle:
+            robot.stop()
+            return gyro_sensor.angle() - (-90 - beggining_angle)
+        
+def turnB():
+    robot.drive(-1.5*math.pi*140,90)
+    beggining_angle = gyro_sensor.angle()
+    while True:
+        if gyro_sensor.angle()  <= -90 - beggining_angle:
+            robot.stop()
+            return gyro_sensor.angle() - (-90 - beggining_angle)
 
 def getCover():
     robot.drive(DRIVE_SPEED / 3, 0)
@@ -74,23 +76,23 @@ def stop():
 def go(distance, currentGyro):
     robot.reset()
     gyro_sensor.reset_angle(currentGyro)
-    while robot.distance() < distance * DISTANCE_MULTIPLIER:
-        robot.drive(100, -gyro_sensor.angle())
+    while -robot.distance() < distance * DISTANCE_MULTIPLIER:
+        robot.drive(-100, -gyro_sensor.angle())
         print("distance", robot.distance())
         print("gyro", gyro_sensor.angle())
         wait(50)
     
     print("going straight for", distance * DISTANCE_MULTIPLIER)
 
-grabber_motor.dc(-100)
+# grabber_motor.dc(-100)
 # go(3.5, 0)
-# turnA()
-# go(5)
-# turnB()
-# go(3)
-# turnA()
-# go(6)
-# go(-3.5)
-# turnB()
-go(0.5)
+# firstOffset = turnA()
+# go(5, firstOffset)
+# secondOffset = turnB()
+# go(3, thirdOffset)
+# thirdOffset = turnA()
+# go(6, thirdOffset)
+# go(-3.5, 0)
+# fourthOffset = turnB()
+# go(0.5, 0)
 dropOff()

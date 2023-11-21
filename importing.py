@@ -1,6 +1,6 @@
 #!/usr/bin/env pybricks-micropython
-from pybricks.ev3devices import Motor, ColorSensor, GyroSensor, UltrasonicSensor
-from pybricks.parameters import Port
+from pybricks.ev3devices import Motor, ColorSensor, GyroSensor, UltrasonicSensor, TouchSensor
+from pybricks.parameters import Port, Stop
 from pybricks.robotics import DriveBase
 from pybricks.hubs import EV3Brick
 from pybricks.tools import wait, StopWatch
@@ -10,6 +10,7 @@ left_motor = Motor(Port.B)
 right_motor = Motor(Port.C)
 grabber_motor = Motor(Port.D)
 gyro_sensor = GyroSensor(Port.S1)
+touchSensor = TouchSensor(Port.S2)
 ev3 = EV3Brick()
 stop_watch = StopWatch()
 
