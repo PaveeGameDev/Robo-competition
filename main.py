@@ -17,7 +17,7 @@ def b_turn():
         if gyro_sensor.angle()  <= -90:
             robot.stop()
             return gyro_sensor.angle() % -90
-""" 
+
 WHEEL_DIAMETER = 40
 AXLE_TRACK = 200
 START_TIME = time.time()
@@ -26,9 +26,9 @@ DROP_OFF_SPEED = 100
 TIME_TO_MIDDLE = 80 
 TIME_TO_STOP = 83 
 DISTANCE_MULTIPLIER = 280
-START_POINT = [0,0,0] ##TODO get the position
 SIDE_OF_US = -1
-US_OFFSET = [-85,40] ##TODO get the numbers
+US_OFFSET = [-85,40] 
+
 #-#-# Release variables
 TIME_TO_GO_BACK = 5
 CUKNOUT_SPEED = 20
@@ -82,31 +82,15 @@ def go(distance, currentGyro):
     
     print("going straight for", distance * DISTANCE_MULTIPLIER)
 
-
-def turn(angle):
-    global gyroAngle
-    global gyroOffset
-    print("turning", angle)
-    robot.turn(angle)
-    currentgyroError = gyrogyro_sensor.angle() - angle - gyroAngle
-    print("gyro error", currentgyroError)
-    print("gyro offset", gyroOffset)
-    gyroAngle = gyrogyro_sensor.angle()
-    gyroOffset += currentgyroError
-
 grabber_motor.dc(-100)
-go(1, 10)
-# go(3.5)
-# turn(90)
-# go(7)
-# turn(90)
+# go(3.5, 0)
+# turnA()
 # go(5)
-# turn(90)
-# go(7)
-# turn(90)
-# go(2.5)
-# turn(90)
-# go(3.5)
-# turn(90)
-# wait(10)
-dropOff() """
+# turnB()
+# go(3)
+# turnA()
+# go(6)
+# go(-3.5)
+# turnB()
+go(0.5)
+dropOff()

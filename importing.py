@@ -8,10 +8,8 @@ from pybricks.tools import wait, StopWatch
 # Initialize everything
 left_motor = Motor(Port.B)
 right_motor = Motor(Port.C)
-# grabber_motor = Motor(Port.C)
-#line_sensor = ColorSensor(Port.S1)
+grabber_motor = Motor(Port.D)
 gyro_sensor = GyroSensor(Port.S1)
-#USsensor = UltrasonicSensor(Port.S3)
 ev3 = EV3Brick()
 stop_watch = StopWatch()
 
