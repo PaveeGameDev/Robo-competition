@@ -3,13 +3,15 @@ from importing import robot,  ev3, stop_watch,gyro_sensor #grabber_motor, line_s
 #from DPS import DPS_class
 import time
 import math
-
-robot.drive(-140,100)
-time1 = time.time()
-while True:
-    if gyro_sensor.angle() >= 90 or time.time() - time1 >= 1:
-        ev3.speaker.beep()
-        break
+def a_turn():
+    robot.drive(-0.5*math.pi*140,90)
+    time1 = time.time()
+    while True:
+        if gyro_sensor.angle() <= -90:
+            robot.stop()
+            ev3.speaker.beep()
+            print(gyro_sensor.angle())
+            break
 """ 
 WHEEL_DIAMETER = 40
 AXLE_TRACK = 200
