@@ -9,18 +9,14 @@ def a_turn():
     while True:
         if gyro_sensor.angle() <= -90:
             robot.stop()
-            ev3.speaker.beep()
-            print(gyro_sensor.angle())
-            break
+            return gyro_sensor.angle() % -90
         
 def b_turn():
     robot.drive(-1.5*math.pi*140,-90)
     while True:
-        if gyro_sensor.angle() >= 90:
+        if gyro_sensor.angle()  <= -90:
             robot.stop()
-            ev3.speaker.beep()
-            print(gyro_sensor.angle())
-            break
+            return gyro_sensor.angle() % -90
 """ 
 WHEEL_DIAMETER = 40
 AXLE_TRACK = 200
