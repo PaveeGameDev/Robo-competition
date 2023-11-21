@@ -4,6 +4,25 @@ from importing import robot,  ev3, stop_watch,gyro_sensor, grabber_motor, touchS
 import time
 import math
 
+<<<<<<< HEAD
+=======
+def a_turn():
+    robot.drive(-0.5*math.pi*140,90)
+    beggining_angle = gyro_sensor.angle()
+    while True:
+        if gyro_sensor.angle() <= -90 - beggining_angle:
+            robot.stop()
+            return gyro_sensor.angle() - (-90 - beggining_angle)
+        
+def b_turn():
+    robot.drive(-1.5*math.pi*140,90)
+    beggining_angle = gyro_sensor.angle()
+    while True:
+        if gyro_sensor.angle()  <= -90 - beggining_angle:
+            robot.stop()
+            return gyro_sensor.angle() - (-90 - beggining_angle)
+
+>>>>>>> e18cb87e66eb05bfce8e99a97345a920c55747aa
 WHEEL_DIAMETER = 40
 AXLE_TRACK = 200
 START_TIME = time.time()
@@ -76,8 +95,8 @@ def stop():
 def go(distance, currentGyro):
     robot.reset()
     gyro_sensor.reset_angle(currentGyro)
-    while -robot.distance() < distance * DISTANCE_MULTIPLIER:
-        robot.drive(-100, -gyro_sensor.angle())
+    while abs(robot.distance()) < abs(distance * DISTANCE_MULTIPLIER):
+        robot.drive(100 * abs(distance)/distance, -gyro_sensor.angle())
         print("distance", robot.distance())
         print("gyro", gyro_sensor.angle())
         wait(50)
