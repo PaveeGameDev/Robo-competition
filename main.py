@@ -6,18 +6,20 @@ import math
 
 def a_turn():
     robot.drive(-0.5*math.pi*140,90)
+    beggining_angle = gyro_sensor.angle()
     while True:
-        if gyro_sensor.angle() <= -90:
+        if gyro_sensor.angle() <= -90 - beggining_angle:
             robot.stop()
-            return gyro_sensor.angle() % -90
+            return gyro_sensor.angle() - (-90 - beggining_angle)
         
 def b_turn():
-    robot.drive(-1.5*math.pi*140,-90)
+    robot.drive(-1.5*math.pi*140,90)
+    beggining_angle = gyro_sensor.angle()
     while True:
-        if gyro_sensor.angle()  <= -90:
+        if gyro_sensor.angle()  <= -90 - beggining_angle:
             robot.stop()
-            return gyro_sensor.angle() % -90
-""" 
+            return gyro_sensor.angle() - (-90 - beggining_angle)
+
 WHEEL_DIAMETER = 40
 AXLE_TRACK = 200
 START_TIME = time.time()
@@ -74,8 +76,8 @@ def stop():
 def go(distance, currentGyro):
     robot.reset()
     gyro_sensor.reset_angle(currentGyro)
-    while robot.distance() < distance * DISTANCE_MULTIPLIER:
-        robot.drive(100, -gyro_sensor.angle())
+    while abs(robot.distance()) < abs(distance * DISTANCE_MULTIPLIER):
+        robot.drive(100 * abs(distance)/distance, -gyro_sensor.angle())
         print("distance", robot.distance())
         print("gyro", gyro_sensor.angle())
         wait(50)
@@ -109,4 +111,4 @@ go(1, 10)
 # go(3.5)
 # turn(90)
 # wait(10)
-dropOff() """
+dropOff()
