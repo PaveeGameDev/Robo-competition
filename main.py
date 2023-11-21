@@ -4,8 +4,6 @@ from importing import robot,  ev3, stop_watch,gyro_sensor, grabber_motor, touchS
 import time
 import math
 
-<<<<<<< HEAD
-=======
 def a_turn():
     robot.drive(-0.5*math.pi*140,90)
     beggining_angle = gyro_sensor.angle()
@@ -22,7 +20,6 @@ def b_turn():
             robot.stop()
             return gyro_sensor.angle() - (-90 - beggining_angle)
 
->>>>>>> e18cb87e66eb05bfce8e99a97345a920c55747aa
 WHEEL_DIAMETER = 40
 AXLE_TRACK = 200
 START_TIME = time.time()
@@ -38,7 +35,7 @@ DRIVE_SPEED = 100
 #-#-# Release variables
 TIME_TO_GO_BACK = 5
 CUKNOUT_SPEED = 20
-RELEASE_WHEELS_WAIT_TIME = 0.5
+RELEASE_WHEELS_WAIT_TIME = 1.5
 RELEASE_WHEELS_SPEED = 100
 
 # Get cover variables
@@ -71,20 +68,36 @@ def turnB():
 
 def getCover():
     robot.drive(DRIVE_SPEED / 3, 0)
-    wait(500)
+    wait(1000)
     stop()
     
 def dropOff():
-    grabber_motor.run_time(1000, 0.4 * 1000, then=Stop.HOLD, wait=True)
-    grabber_motor.run_time(-1000, 1 * 1000, then=Stop.HOLD, wait=True)
-    while touchSensor.pressed():
-        robot.drive(DRIVE_SPEED / 3, 0)
-        
-    robot.drive(DRIVE_SPEED / 3, 0)
+    print("drop off")
+    grabber_motor.dc(100)
+    wait(400)
+    grabber_motor.dc(-100)
+    wait(200)
+    grabber_motor.dc(100)
+    wait(400)
+    grabber_motor.dc(-100)
+    wait(200)
+    grabber_motor.dc(100)
+    wait(400)
+    grabber_motor.dc(-100)
+    wait(200)
+    grabber_motor.dc(100)
+    wait(400)
+    grabber_motor.dc(-100)
     wait(2000)
-    grabber_motor.run_time(1000, RELEASE_WHEELS_WAIT_TIME * 1000, then=Stop.HOLD, wait=False)
+    grabber_motor.dc(0)
+    while not touchSensor.pressed():
+        robot.drive(DRIVE_SPEED / 3, 0)
     robot.drive(DRIVE_SPEED / 3, 0)
-    wait(500)
+    wait(1000)
+    grabber_motor.run_time(1000, RELEASE_WHEELS_WAIT_TIME * 1000, then=Stop.HOLD, wait=False)
+    # robot.drive(DRIVE_SPEED / 3, 0)
+    # wait(500)
+    print("drop off done")
     getCover()
     
 def stop():
@@ -93,17 +106,30 @@ def stop():
     ev3.speaker.beep()
 
 def go(distance, currentGyro):
+    print("going straight for", distance * DISTANCE_MULTIPLIER)
     robot.reset()
     gyro_sensor.reset_angle(currentGyro)
     while abs(robot.distance()) < abs(distance * DISTANCE_MULTIPLIER):
-        robot.drive(100 * abs(distance)/distance, -gyro_sensor.angle())
+        robot.drive(-200 * abs(distance)/distance, -gyro_sensor.angle())
         print("distance", robot.distance())
         print("gyro", gyro_sensor.angle())
         wait(50)
     
-    print("going straight for", distance * DISTANCE_MULTIPLIER)
-
-# grabber_motor.dc(-100)
+    
+# def alternativeGo(distance, currentGyro):
+#     print("going straight for", distance * DISTANCE_MULTIPLIER)
+#     robot.reset()
+#     gyro_sensor.reset_angle(currentGyro)
+#     robot.stop()
+#     while abs(robot.distance()) < abs(distance * DISTANCE_MULTIPLIER):
+#         left_motor.run(DRIVE_SPEED * abs(distance)/distance)
+#         right_motor.run(DRIVE_SPEED * abs(distance)/distance)
+#         print("distance", robot.distance())
+#         print("gyro", gyro_sensor.angle())
+#         wait(50)
+    
+grabber_motor.dc(-100)
+wait(500)
 # go(3.5, 0)
 # firstOffset = turnA()
 # go(5, firstOffset)
