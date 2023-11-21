@@ -1,30 +1,174 @@
 #!/usr/bin/env pybricks-micropython
-from pybricks.ev3devices import Motor, ColorSensor
-from pybricks.parameters import Port
-from pybricks.tools import wait
-from pybricks.robotics import DriveBase
+from importing import robot,  ev3, stop_watch,gyro_sensor, grabber_motor, touchSensor, wait, Stop
+#from DPS import DPS_class
+import time
+import math
 
-# Initialize everything
-left_motor = Motor(Port.B)
-right_motor = Motor(Port.A)
-line_sensor = ColorSensor(Port.S3)
-robot = DriveBase(left_motor, right_motor, wheel_diameter=55.5, axle_track=162)
+def a_turn():
+    robot.drive(-0.5*math.pi*140,90)
+    beggining_angle = gyro_sensor.angle()
+    while True:
+        if gyro_sensor.angle() <= -90 - beggining_angle:
+            robot.stop()
+            return gyro_sensor.angle() - (-90 - beggining_angle)
+        
+def b_turn():
+    robot.drive(-1.5*math.pi*140,90)
+    beggining_angle = gyro_sensor.angle()
+    while True:
+        if gyro_sensor.angle()  <= -90 - beggining_angle:
+            robot.stop()
+            return gyro_sensor.angle() - (-90 - beggining_angle)
 
-# constanc
-BLACK = 17
-WHITE = 57
-threshold = (BLACK + WHITE) / 2
+WHEEL_DIAMETER = 40
+AXLE_TRACK = 200
+START_TIME = time.time()
+GRAB_SPEED = 10000
+DROP_OFF_SPEED = 100
+TIME_TO_MIDDLE = 80 
+TIME_TO_STOP = 83 
+DISTANCE_MULTIPLIER = 280
+SIDE_OF_US = -1
+US_OFFSET = [-85,40] 
 DRIVE_SPEED = 100
 
-# Start following the line endlessly.
-while True:
-    deviation = line_sensor.reflection() - threshold
+#-#-# Release variables
+TIME_TO_GO_BACK = 5
+CUKNOUT_SPEED = 20
+RELEASE_WHEELS_WAIT_TIME = 4
+RELEASE_WHEELS_SPEED = 100
 
-    # Calculate the turn rate.
-    turn_rate = deviation * abs(deviation) / 3
-    print(turn_rate)
+# Get cover variables
+TIME_TO_GET_COVER = 5
+current_time_from_start = time.time()
+gyro_angle = 0
+turn_rate_multiplier = 1
+wentToMiddle = False
+gettingCover = False
 
+# Going variables
+gyroAngle = 0
+gyroOffset = 0
+
+def turnA():
+    robot.drive(-0.5*math.pi*140,90)
+    beggining_angle = gyro_sensor.angle()
+    while True:
+        if gyro_sensor.angle() <= -90 - beggining_angle:
+            robot.stop()
+            return gyro_sensor.angle() - (-90 - beggining_angle)
+
+    return 0
+        
+def turnB():
+    robot.drive(-1.5*math.pi*140,90)
+    beggining_angle = gyro_sensor.angle()
+    while True:
+        if gyro_sensor.angle()  <= -90 - beggining_angle:
+            robot.stop()
+            return gyro_sensor.angle() - (-90 - beggining_angle)
+
+def getCover():
+    robot.drive(DRIVE_SPEED / 3, 0)
+    wait(2000)
+    stop()
     
+def dropOff():
+    print("drop off")
+    grabber_motor.dc(100)
+    wait(300)
+    grabber_motor.dc(-100)
+    wait(300)
+    grabber_motor.dc(100)
+    wait(300)
+    grabber_motor.dc(-100)
+    wait(2000)
+    grabber_motor.dc(0)
+    grabber_motor.run_time(-10000, 0.5 * 1000, then=Stop.HOLD, wait=False)
+    while not touchSensor.pressed():
+        robot.drive(DRIVE_SPEED / 3, 0)
+    robot.drive(DRIVE_SPEED / 3, 0)
+    wait(2500)
+    robot.drive(-DRIVE_SPEED / 3, 0)
+    wait(1000)
+    grabber_motor.dc(100)
+    wait(2200)
+    # grabber_motor.run_time(10000, RELEASE_WHEELS_WAIT_TIME * 1000, then=Stop.HOLD, wait=True)
+    print("drop off done")
+    getCover()
+    
+def stop():
+    robot.stop()
+    grabber_motor.stop()
+    ev3.speaker.beep()
 
-    # Set the drive base speed and turn rate.
-    robot.drive(DRIVE_SPEED/((abs(turn_rate)/100)+1), turn_rate)
+def go(distance, currentGyro):
+    print("going straight for", distance * DISTANCE_MULTIPLIER)
+    robot.reset()
+    gyro_sensor.reset_angle(currentGyro)
+    while abs(robot.distance()) < abs(distance * DISTANCE_MULTIPLIER):
+        robot.drive(-100 * abs(distance)/distance, gyro_sensor.angle())
+        print("distance", robot.distance())
+        print("gyro", gyro_sensor.angle())
+        wait(50)
+    
+    
+# def alternativeGo(distance, currentGyro):
+#     print("going straight for", distance * DISTANCE_MULTIPLIER)
+#     robot.reset()
+#     gyro_sensor.reset_angle(currentGyro)
+#     robot.stop()
+#     while abs(robot.distance()) < abs(distance * DISTANCE_MULTIPLIER):
+#         left_motor.run(DRIVE_SPEED * abs(distance)/distance)
+#         right_motor.run(DRIVE_SPEED * abs(distance)/distance)
+#         print("distance", robot.distance())
+#         print("gyro", gyro_sensor.angle())
+#         wait(50)
+    
+def folow_wall(target):
+    distance = USsensor.distance()
+    
+    if distance - 20 > target:
+        robot.turn(10)
+        robot.drive(-100, 0)
+    elif distance + 20 < target:
+        robot.turn(-10)
+        robot.drive(-100,0)
+    else:
+        robot.drive(-100,0)
+
+def turn(angle):
+    print("turning", angle)
+    gyro_sensor.reset_angle(0)
+    robot.turn(angle)
+    currentgyroError = gyro_sensor.angle() - angle
+    print("gyro error", currentgyroError % 90)
+    return currentgyroError % 90
+
+grabber_motor.dc(-100)
+wait(1000)
+go(3.5, 0)
+firstOffset = turn(45)
+go(0.7,0)
+secondError = turn(abs(45 - firstOffset))
+go(4.5, 0)
+firstOffset = turn(22)
+go(2.061,0)
+secondError = turn(abs(78 - firstOffset))
+go(3, 0)
+firstOffset = turn(45)
+go(0.7,0)
+secondError = turn(abs(45 - firstOffset))
+go(4.5, 0)
+firstOffset = turn(22)
+go(2.061,0)
+secondError = turn(abs(78 - firstOffset))
+
+firstOffset = turn(45)
+go(0.7,0)
+secondError = turn(abs(45 - firstOffset))
+go(1.5,0)
+firstOffset = turn(45)
+go(0.7,0)
+secondError = turn(abs(45 - firstOffset))
+dropOff()
